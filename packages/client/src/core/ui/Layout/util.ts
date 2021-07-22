@@ -1,13 +1,65 @@
+import CSS from "csstype";
+
+/******************************
+ * Repsonsive
+ ******************************/
+type AtLeastOne<T> = {
+    [K in keyof T]-?: Required<Pick<T, K>> & Partial<Pick<T, Exclude<keyof T, K>>>;
+}[keyof T];
+
+export type Screens = "mobile" | "tablet" | "desktop" | "wide";
+export type ScreenValues<P> = Record<Screens, P>;
+export type Responsive<P> = P | AtLeastOne<ScreenValues<P>>;
+
+const getResponsiveValue = <P>(screen: Screens, responsive?: Responsive<P>) => {
+    if (typeof responsive === "object") {
+        // @ts-ignore
+        return responsive[screen] || undefined;
+    }
+    return responsive;
+};
+
+export const getResponsive = <P>(
+    property: string,
+    getValue: (p?: P) => string,
+    responsive?: Responsive<P>,
+) => {
+    const fallback = getValue();
+    const mobile = getValue(getResponsiveValue("mobile", responsive));
+    const tablet = getValue(getResponsiveValue("tablet", responsive));
+    const desktop = getValue(getResponsiveValue("desktop", responsive));
+    const wide = getValue(getResponsiveValue("wide", responsive));
+
+    return css`
+        ${`${property}: ${fallback}`};
+
+        @media (min-width: 1920px) {
+            ${`${property}: ${wide}`};
+        }
+        @media (max-width: 1920px) {
+            ${`${property}:${desktop}`};
+        }
+        @media (max-width: 1024px) {
+            ${`${property}: ${tablet}`};
+        }
+        @media (max-width: 768px) {
+            ${`${property}: ${mobile}`};
+        }
+    `;
+};
+
 /******************************
  * Alignment
  ******************************/
 
 import { Theme } from "src/core/theme/theme";
+import { css, CSSProperties } from "styled-components";
 
 export type Align = "start" | "center";
+export type RepsonsiveAlign = Responsive<Align>;
 
 export interface Alignable {
-    align?: Align;
+    align?: RepsonsiveAlign;
 }
 
 const alignToFlexAlignLookup = {
@@ -30,8 +82,9 @@ export type Spacing =
     | "large"
     | "xlarge"
     | "xxlarge";
+export type RepsonsiveSpacing = Responsive<Spacing>;
 
-const spacingMultiplier = {
+const spacingRatios = {
     none: 0,
     xxsmall: 0.25,
     xsmall: 0.5,
@@ -42,20 +95,22 @@ const spacingMultiplier = {
     xxlarge: 16,
 } as const;
 
-export const getSpacing = (base: number, spacing: Spacing = "small") => {
-    const mutiplier = spacingMultiplier[spacing] ?? 1;
-    return base * mutiplier;
+export const getSpacing = (base: number, multiplier: number = 1) => (
+    spacing: Spacing = "small",
+) => {
+    const spaceRatio = spacingRatios[spacing] ?? 1;
+    return base * spaceRatio * multiplier + "px;";
 };
 
 export interface Spacable {
-    spacing?: Spacing;
+    spacing?: RepsonsiveSpacing;
 }
 
 export interface TRBLSpacable {
-    spacingTop?: Spacing;
-    spacingRight?: Spacing;
-    spacingBottom?: Spacing;
-    spacingLeft?: Spacing;
+    spacingTop?: RepsonsiveSpacing;
+    spacingRight?: RepsonsiveSpacing;
+    spacingBottom?: RepsonsiveSpacing;
+    spacingLeft?: RepsonsiveSpacing;
 }
 
 /******************************
@@ -80,6 +135,7 @@ export interface Componentable {
  * Size
  ******************************/
 export type Size = "full";
+export type RepsonsiveSize = Responsive<Size>;
 
 const sizeMap = {
     full: "100%",
@@ -90,15 +146,15 @@ export const getSizing = (size?: Size) => {
 };
 
 export interface Sizable {
-    size?: Size;
+    size?: RepsonsiveSize;
 }
 
 export interface WidthSizable {
-    width?: Size;
+    width?: RepsonsiveSize;
 }
 
 export interface HeightSizable {
-    height?: Size;
+    height?: RepsonsiveSize;
 }
 
 /******************************

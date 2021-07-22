@@ -8,7 +8,11 @@ export interface Props {
 
 export const Page: FC<Props> = ({ title, children }) => {
     return (
-        <Box align="center" width="full" spacing="medium">
+        <Box
+            align="center"
+            width="full"
+            spacing={{ mobile: "xsmall", tablet: "medium", desktop: "medium", wide: "medium" }}
+        >
             <Helmet>
                 <title>{`${title} | DanielSinnott.com`}</title>
             </Helmet>

@@ -20,7 +20,7 @@ const Template: Story<Props> = (args) => (
 );
 
 export const Default = Template.bind({});
-Default.args = {};
+Default.args = { spacing: { mobile: "xsmall", tablet: "medium", desktop: "xlarge" } };
 
 export const XSmall = Template.bind({});
 XSmall.args = { spacing: "xsmall" };

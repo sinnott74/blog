@@ -25,7 +25,7 @@ export const BlogList: FC<BlogListProps> = ({ posts, onTagClick }) => {
             itemsPerPage={8}
             onPageChange={setPage}
             renderItem={renderPost}
-            columns={2}
+            columns={{ mobile: 1, tablet: 2, desktop: 2, wide: 2 }}
         />
     );
 };
