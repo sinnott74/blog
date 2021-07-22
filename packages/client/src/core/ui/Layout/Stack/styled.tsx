@@ -14,7 +14,7 @@ export const StackContainer = styled.div<Alignable & Spacable>`
     flex-direction: column;
     ${(props) => getResponsive<Align>("align-items", getAlignment, props.align)}
     ${(props) =>
-        getResponsive<Spacing>("margin-top", getSpacing(props.theme.spacing), props.spacing)}
+        getResponsive<Spacing>("margin-top", getSpacing(props.theme.spacing, -1), props.spacing)}
 `;
 
 export const StackItem = styled.div<Spacable>`
