@@ -1,0 +1,145 @@
+---
+title: Javascript's own ThreadLocal
+author: Daniel Sinnott
+imageurl: https://i.imgur.com/VPnnX8P.png
+id: 12
+tags:
+    - Javascript
+    - AsyncHooks
+date: Mon, 26th Mar 2018
+created: 2018-03-26T14:47:05.542Z
+---
+
+The concurrency model of `Java` & `Javascript` is very different.
+
+I was to discuss them both today from the context of setting a variable to be used throughout a
+single business process. Consider a server which receives a `GET` request. At some point during the
+business process carried out during the request lifecycle something is written to a log file. If we
+consider the request to a single transaction, we might want the transaction's ID to be included in
+the log as we might have several transaction writing to log at the same time.
+
+### Java
+
+Java uses a multi-threading model. A thread according the Javadocs is a thread of execution of a
+program. Commands in the same thread execute sequentially. When a blocking command is executed (e.g.
+I/O) the thread will wait for it to be completed until is executes the next command, however this
+will not prevent other threads from executing, therefore not completely blocking the application.
+Threads can be seen to be wasteful with resources as they may be sitting there doing nothing while
+waiting, however they allow for a much easier development experience. Enter [`ThreadLocal`].
+
+```java
+public class Transaction {
+
+  // Initialise ThreadLocal which contains a map to store all of our Thread scoped variables
+  private static ThreadLocal<HashMap<Object, Object>> threadScopedVariable =
+      new ThreadLocal<HashMap<Object, Object>>();
+
+  // Getter
+  public static getThreadScopedVariable(Object identifier){
+      return threadScopedVariables.get(identifier);
+  }
+
+  // Setter
+  public setThreadScopedVariable(Object identifier, Object variable) {
+      threadScopedVariables.set(identifier);
+  }
+
+}
+```
+
+The above class can be used to set variables that are scoped to each individual thread. For example
+setting a transactionID.
+
+### Javascript
+
+Javascript uses a single threaded, event loop based concurrency model. All execution of code happens
+in the same thread (ignoring [Web Workers] in browser land). If a command blocks the thread, the
+application comes to a halt until that command finishes. Its poor practice & actively discourages to
+write blocking code. Callbacks & Promises go a long way to helping write good javascript commands.
+These both rely on the event loop. For more info on the event loop see my post [Task, Microtasks &
+Automobiles]. In layman's terms, the when a "Task" is blocked the event loop will pick up another to
+execute until the previous is ready. This can be very efficient with resources, however it makes it
+very difficult to determine is a command is happening in the same transaction as another command as
+they all run on the same thread.
+
+Those familiar with this issue in Javascript may immediately think of [Continuation-Local Storage]
+(CLS), however this implementation has issues & loses context is certain situations, hence packages
+like [cls-bluebird] patching CLS in some situations but not all.
+
+Enter [`AsyncHooks`]. AsyncHooks is a (currently as of v9.9) experimental API in NodeJS. It allows
+for a lifecycle to be added around each async resource execution to contains a reference to its
+AsyncID & its parents AsyncID. From this its possible to build up a thread like transaction model.
+
+```javascript
+const asyncHooks = require("async_hooks");
+
+const map = new Map();
+
+const hook = asyncHooks.createHook({
+    /**
+     * Sets the parent's context as the current context
+     */
+    init: function init(asyncId, type, triggerAsyncId) {
+        const parentContext = map.get(triggerAsyncId);
+        if (parentContext) {
+            // set parent context as current context
+            map.set(asyncId, parentContext);
+        }
+    },
+
+    /**
+     * Remove the data
+     */
+    destroy: function destroy(asyncId) {
+        if (map.has(asyncId)) {
+            map.delete(asyncId);
+        }
+    },
+});
+hook.enable();
+
+/**
+ * Set the key/value for this score
+ * @param {String} key The key of value
+ * @param {String} value The value
+ */
+exports.set = function setValue(key, value) {
+    const id = asyncHooks.executionAsyncId();
+    let data = map.get(id);
+    if (!data) {
+        data = {};
+        map.set(id, data);
+    }
+    data[key] = value;
+};
+
+/**
+ * Get the value by key
+ * @param {String} key The key of value
+ */
+exports.get = function getValue(key) {
+    const id = asyncHooks.executionAsyncId();
+    const data = map.get(id);
+    return data[key];
+};
+```
+
+The above javascript code is analogous to the Java code earlier. Both include a getter & setter for
+transaction scoped variable. The call to `asyncHooks.createHook` creates init & destroy lifecycle
+hook around each async resource which allows us to keep track of the context in which the resource
+is operating. A transaction scoped variable can be placed into that context & access by code which
+is a child of the code which created the context. E.g. if we created a TransactionID variable & put
+it into the context at the very beginning of our request lifecycle, it can be accessed by an code
+called during that request.
+
+AsyncHooks do a performance impact as the extra code being called & extra object being stored in
+memory, however it allows you to write much cleaner code as the TransactionID or even a database
+transaction object don't need to be passed around to event function in the entire application. The
+can simple be accessed when needed.
+
+[`threadlocal`]: https://docs.oracle.com/javase/7/docs/api/java/lang/ThreadLocal.html
+[web workers]: https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
+[task, microtasks & automobiles]: /blog/7
+[continuation-local storage]: https://github.com/othiym23/node-continuation-local-storage
+[cls-bluebird]: https://www.npmjs.com/package/cls-bluebird
+[`asynchooks`]: https://nodejs.org/api/async_hooks.html

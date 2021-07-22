@@ -1,0 +1,364 @@
+---
+title: One month at a time
+author: Daniel Sinnott
+imageurl: https://i.imgur.com/SIZ0oeR.png
+id: 4
+tags:
+    - Monthly Challenge
+    - January
+    - Technical
+    - ReactJS
+    - NodeJS
+date: Thu, 1st Feb 2018
+created: 2018-02-02T12:31:36.533Z
+---
+
+As outlined in the post [So it begins] (January Challege), the technical challenge for this month
+was to get this blog up & running. My deliverable was a blogging web app that I could use to write,
+edit & read blogposts, but build in a way that I could progressively enhance.
+
+The [source for this site] can be found on Github.
+
+---
+
+## The Architecture
+
+I chose the the classic client server model, with the two being fully separated to allow me to
+develop each independently. Date storage was of great concern over the month. I'd like to be able
+look back on these post in the distant future & cringe, and also for these posts to be available to
+others. A database hosted in the cloud was the conclusion.
+
+---
+
+## Client
+
+In 2017 I spent a good chunk of time working with [Dojo] for work & [PolymerJS] in my spare time,
+but the goal was to learn new things and I was becoming very frustrated with Polymer's constant API
+& concept changes. After a bit a research, [ReactJS], [VueJS] & [AngularJS] were the front running
+web frameworks that I could get up and running with quickly & seemed to have a promising future
+(although given the rate of change in the web space, these could be obsolete by the end of the
+month). I had spent some time in 2016 learning the original AngularJS framework, so I still have a
+bad taste in my mouth over the compete rewrite & api breaking changes for Angular 2+, so that was
+quickly ruled out. Internally in work, React was being chosen for a large new project so it made to
+most sense for me to become familiar with it.
+
+React is a javascript library for building user interfaces. It's declarative, component-based & uses
+a one way data flow model. It was originally developed internally at facebook, but put into mass
+production at Instagram.
+
+---
+
+### State
+
+I quickly set out developing my [App Shell]. React's one way data flow model meant that state should
+be stored at the highest needed point in the tree and flow downwards, but while creating my
+application components like the NavBar, ToolBar & OptionsMenu, I realised that storing most state at
+the root component level won't scale.
+
+[Redux] to the rescue. Redux is a predictable state container based on Facebook's Flux architecture.
+It's state is tightly controller & can only be updated using Redux's infrastructure. Actions, which
+can be thought of as events, are dispatched and the reducer associated with each action then has
+permission to update the application state/store.Here's a simple example used by my SideNav.
+
+Action is defined as:
+
+```javascript
+export const OPEN_SIDENAV = "OPEN_SIDENAV";
+export function openSideNav() {
+    return {
+        type: OPEN_SIDENAV,
+    };
+}
+```
+
+My Header is connected to redux so it can dispatch actions
+
+```jsx
+import React from 'react';
+import { connect } from 'react-redux'
+import { openSideNav } from '../../actions/sidenav';
+class Header extends React.Component {
+....
+  render() {
+    return (
+     ...
+       <Button icon className="header__menu"  onClick={this.props.handleMenuButtonClick}>menu</Button>
+     ...
+    )
+  }
+}
+const mapDispatchToProps = {
+  handleMenuButtonClick: openSideNav
+}
+export default connect(null, mapDispatchToProps)(Header)
+
+```
+
+The associated reducer updates the Redux store:
+
+```javascript
+import { OPEN_SIDENAV } from '../../actions/sidenav';
+ let initialState = {
+   opened : false
+ }
+ const sidenav = (state = initialState, action)  => {
+  switch (action.type) {
+    case OPEN_SIDENAV:
+      return {
+        ...state,
+        opened: true
+    default:
+      return state;
+  }
+}
+export default sidenav;
+
+```
+
+Finally we tell the SideNav to subscribe to changes to the opened property:
+
+```jsx
+import React from 'react';
+import { connect } from "react-redux";
+class SideNav extends React.Component {
+...
+}
+const mapStateToProps = (state) =>({
+  opened: state.ui.sidenav.opened
+})
+export default connect(mapStateToProps, null)(SideNav)
+```
+
+When the opened property changes, react will re-render my sidenav & open it
+
+---
+
+### Build System
+
+It important for any website to have a good user experience. UX is mostly focuses on user interface
+& user interaction, but it also encompasses site performance & working on as many devices as
+possible (think of it as casting a bigger net to catch more fish). You build system has a big
+influence on those final two points. A site should only download the resources needed to run that
+site at that time. Downloading & running unnecessary delays the time to first paint & time to first
+interaction and because of that ruins the experience.
+
+Most modern javascript library are written in the new ES2015+ syntax with feature such as classes or
+Promises. These feature won't work on older browsers. New syntax code needs to be transpiled in the
+older syntax. This transpilation would need to happen a build time.
+
+[Webpack] & React go together like peas & carrots (Forrest Gump reference). Webpack is a resource
+bundler. It takes all the files that is necessary to run your application and bundles them together.
+It supports [tree shaking] to eliminate dead unnecessary code, and has a plugin architecture to add
+other tools to your build process such as javascript translation with [Babel].
+
+Webpack was the obvious choice. Although there's lot of tutorials on webpack, its fairly confusing
+to set up. I had to guts of it fully up and running in the first week. I had all my required loaders
+converting my assets & I have hot reloading configured in development mode. However, I wasn't happy
+with the amount of dependencies in my package.json just for my build system. On the 20th day I
+decided to convert my app to a Create React App (see [commit]), which I had initially shunned as it
+hid all the complexity of setting up webpack. It reduced the amount of dependencies my web app had &
+also offloaded the maintenance of my build system to Facebook.
+
+---
+
+### Routing
+
+[React Router] was chosen an my client side router. It plays nicely with redux & when used in
+conjunction with [React Loadable], allowed my code to be split based on route. The code for me
+entire application didn't need to be loaded, only what was needed for a given route.
+
+The example below is code taken from my routes configuration. It says tells Webpack to split the
+code & gives it the name specified by webpackChunkName
+
+```jsx
+import React from "react";
+import { Route, Switch } from "react-router";
+import Loadable from "react-loadable";
+import Spinner from "./components/Spinner";
+const LoadableHomePage = Loadable({
+    loader: () => import(/* webpackChunkName: "indexPage" */ "./pages/HomePage"),
+    loading: Spinner,
+});
+const LoadableBlogListPage = Loadable({
+    loader: () => import(/* webpackChunkName: "BlogListPage" */ "./pages/BlogListPage"),
+    loading: Spinner,
+});
+const Routes = (props) => {
+    return (
+        <Switch className="main">
+            <Route exact path="/" component={LoadableHomePage} />
+            <Route exact path="/blog" component={LoadableBlogListPage} />
+        </Switch>
+    );
+};
+export default Routes;
+```
+
+---
+
+### UI Component Library
+
+I was spending too much of my time developing UI components & decided that it would be more prudent
+to use a UI Component Library. I quite enjoy the look & feel of Google's [Material Design]. This
+gave me the options of:
+
+-   Material-UI
+-   MUI
+-   React-MD
+
+Out of the above 3 React-MD was the clear winner, I had all the components I felt I'd need & it was
+by far the smallest library.
+
+---
+
+### Blog Syntax
+
+With all of the above in place I had my worker web app. The final hurdle I had to face was the
+format I'd let users write their blog posts.
+
+Plain text would be too simple & unappealing visually. Letting HTML or a subset of HTML would allow
+the nightmare of [XSS]. I settled on allowing the users to write their blogs in MarkDown. It allowed
+for some formatting without the headache of trying to catch unwanted code.
+
+The chosen library was [Marked]. A highly performance & small markdown parser and compiler.
+
+---
+
+### Server Interaction
+
+The client would interact with the server in a Rest-like manner. Sending GET, POST, PUT & DELETE
+requests for resources.
+
+---
+
+## Server
+
+There lots of options when it comes to serverside development. The main drivers for my selection
+were:
+
+-   Learn somthing
+-   Speed of development
+-   Can be run for free or at least cheap
+
+I decided to choose [NodeJs] with [ExpressJs]. Keeping the client & server using the same language
+should allow me to share code between the 2 if needed.
+
+---
+
+### Data Layer
+
+As my database I selected [Postresql] as I could avail of a free Tiny Turtle on [ElephantSQL], until
+i need a larger memory allocation. The module [PG] gave me fine grained control over the SQL
+statements sent to the server. I experimented with KnexJS but didn't like its transaction
+infrastructure, mainly due to Node's callback based application flow. More on that in Transactions
+below. PG, along with the module SQL, gave me Parameterized query to help prevent SQL Injection.
+
+---
+
+### Transactions
+
+It was frustrating coming for a Java world, where the concept of ThreadLocal make it easy to pass
+information around the system for a single transaction without having to include it in every method
+call. The asynchronous nature of Node doesn't allow for this. I experimented with Continuation-Local
+Storage last year but found it very hit & miss. The context can easily be lost. Roll forward to this
+year & the release of the experimental Node 8 API AsyncHooks allowed for this problem to be solved
+by the library [async-local-storage]. It wraps each asynchronous & keeps track of which call came
+from where, allowing for a creation of what is analogous to Thread in java. This allowed me to
+request a client for the Postgres pool, start a transaction & use that transaction for every
+database call in a single HTTP request without having to pass a client or transaction object around.
+
+Here's an example of how I'm handling my transactions. It's using async await to handle promises in
+a more readable way.
+
+```javascript
+const als = require("./async-local-storage");
+const uuidV4 = require("uuid/v4");
+const database = require("../core/database"); // module which configures the DB connection
+const expressTransactionMiddleware = async (req, res, next) => {
+    const client = await database.connect();
+    await client.query("BEGIN");
+    als.set("transactionID", uuidV4());
+    als.set("transaction", client);
+    await next();
+};
+```
+
+It's important to COMMIT or ROLLBACK the transaction and release the client back to the pool at the
+end of the request:
+
+```javascript
+const transactionSuccessMiddleware = async () => {
+    let client = als.get('transaction')
+    await client.query('COMMIT');
+    await client.release();
+}
+
+const async transactionFailureMiddleware = async () =>{
+    let client = als.get('transaction')
+    await client.query('ROLLBACK');
+    await client.release();
+  }
+```
+
+---
+
+### Authentication
+
+Users should only be allowed to edit posts which they own... Sounds obvious! To implement this I
+could to use JsonWebToken instead of session. JWT allows to the application scale horizontally as
+it's completely stateless. JWT was used in conjunction with PassportJS. The idea behind this is that
+by using passport now, I'd lessen the pain of changing my authentication to use OAuth by Github,
+Google or Facebook etc.
+
+---
+
+### Database
+
+As mentioned above in Server - Data Layer. I'm using PSQL for my database. I haven't chosen an tools
+to perform maintenance or migration, which will cause me some pain in the future but its a challenge
+I'm looking forward to. Production data is incredibly important. Now that I've 'Officially' released
+the first working version of the Blog, I can't just drop all the tables whenever I'd like & rebuild.
+I'm currently using a library called [Toposort], which sorts directed acyclic graphs, to determine
+which database tables would need to be created first if rebuilding from scratch. I'm using it to
+order the tables by foreign keys, creation whichever tables need to be created first so that they
+can be referenced by another table.
+
+---
+
+## Let the mind dumping begin
+
+I'm now free to write whatever dribble I'd like up here, but of course you won't be forced to read
+it (...yet)
+
+The month was a huge success from a technological point of view. The deadline forced me to work
+toward a goal & not get distracted by other projects or to wait around thinking about / looking for
+a better way to implement something.
+
+The best architecture is the one that works Daniel
+
+[so it begins]: /blog/3
+[source for this site]: https://github.com/sinnott74/sinnott
+[dojo]: https://dojotoolkit.org/
+[polymerjs]: https://www.polymer-project.org/
+[reactjs]: https://reactjs.org/
+[vuejs]: https://vuejs.org/
+[angularjs]: https://angularjs.org/
+[app shell]: https://developers.google.com/web/updates/2015/11/app-shell
+[redux]: https://redux.js.org/
+[webpack]: https://webpack.js.org/
+[tree shaking]: https://webpack.js.org/guides/tree-shaking/
+[babel]: https://babeljs.io/
+[create react app]: https://github.com/facebook/create-react-app
+[commit]: https://github.com/sinnott74/Sinnott/commit/d66341b17a9fe86b79862660dc7cd5216298874c
+[react router]: https://reacttraining.com/react-router/
+[react loadable]: https://github.com/thejameskyle/react-loadable
+[material design]: https://material.io/
+[xss]: https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)
+[marked]: https://www.npmjs.com/package/marked
+[nodejs]: https://nodejs.org/
+[expressjs]: https://expressjs.com/
+[postgresql]: https://www.postgresql.org/
+[elephantsql]: https://www.elephantsql.com
+[pg]: https://www.npmjs.com/package/pg
+[async-local-storage]: https://github.com/vicanso/async-local-storage/
+[toposort]: https://github.com/marcelklehr/toposort

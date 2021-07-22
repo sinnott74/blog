@@ -1,0 +1,68 @@
+---
+title: Small margins make the difference
+author: Daniel Sinnott
+id: 14
+tags:
+    - Monthly Challenge
+    - Technical
+    - March
+    - UI
+date: Sun, 1st Apr 2018
+created: 2018-04-01T22:23:26.666Z
+---
+
+My goal for this month was to fix some small UI/UX issues that I noticed from interacting with the
+blog:
+
+-   The navigation bar needs to be personalised
+-   Each of these blogs are written in [Markdown], and it's a bit annoying to have to save the blog
+    post before I can view how it will look.
+
+## Side Navigation
+
+### Old
+
+The old side navigation needed to be personalised. There's quite a lot history in the side nav. It
+was originally built following an [App Shell] tutorial. The side nav then transformed multiple times
+depending on the technology I was using at the time. Beginning with a handlebars based app, which
+then was converted to a PolymerJS app & now finally built in React. The App Shell title & colourful
+image are hangovers from the original side nav until I was fully decided on what should be placed
+there.
+
+![Old Bloglist Page](https://i.imgur.com/NS5tOp3.png "Old bloglist page")
+
+### New
+
+The new side nav is much cleaner & personalised for myself. Although the side nav doesn't contain a
+lot of colour, I feel it's still very vibrant.
+
+Another update that definitely worth mentioning is that blogposts can now be tagged as you'll see
+below. This will allow for a nice filtering feature in the future.
+
+![New Bloglist Page](https://i.imgur.com/srSXoUN.png "New bloglist page")
+
+## Blog Editor
+
+### Old
+
+The old blog editor was a pain to use. Blogs are written in markdown. So in order for me to preview
+if the blog was looking as I would have expected, I had to save the blog post, view it & then click
+edit again if I i wanted to continue writing.
+
+![Old BlogEditor Page](https://i.imgur.com/tHkNp79.png "Old blog editor page")
+
+### New
+
+The new blog editor is not only much easier to use but it's also much more visually appealing. The
+tabs at the top allow the editor to easily switch between the editor view & the preview view. This
+is fully mobile ready & allows users to swipe between views.
+
+The editor takes advantage of [React-MD] tabs & renders the markdown exactly how the user would see
+the blog post.
+
+![New BlogEditor Page](https://i.imgur.com/jkiUhhO.png "New blog editor page")
+
+![New BlogEditor Preview Page](https://i.imgur.com/FTzBZvj.png "New blog editor preview page")
+
+[app shell]: https://developers.google.com/web/fundamentals/architecture/app-shell
+[react-md]: https://react-md.mlaursen.com/

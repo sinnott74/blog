@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Chip matches the snapshot 1`] = `
+<button
+  class="styled__Container-q6174j-0 hwjSxM"
+  data-testid="chip"
+>
+  <p
+    class="styled__Text-sc-1aodpf0-6 styled__Label-q6174j-1 ewUjkk hMQcoL"
+  >
+    Test
+  </p>
+</button>
+`;

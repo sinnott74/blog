@@ -1,0 +1,273 @@
+---
+title: Metadata is the new meta
+author: Daniel Sinnott
+imageurl: https://i.imgur.com/UNJ8ecB.png
+id: 17
+tags:
+    - Technical
+    - Decorators
+    - Typescript
+date: Tue, 24th Apr 2018
+created: 2018-04-24T13:08:34.299Z
+---
+
+## Decorators
+
+Decorators are a way to add metadata to parts of your Javascript code. Those familar Java will see
+them as Javascript's implementation of annotations.
+
+It's worth noting before we get into it that decorators are overly complicated. **They're just
+functions**.
+
+Decorators are currently a [TC39 Proposal] to add annotations to the ECMA/Javascript language.
+Luckily, this proposal has already been implemented in Microsoft Typescript, which is a superset of
+Javascript. However, the following `compilerOptions` are needed in your `tsconfig.json` to allow you
+to use decorators in typescript.
+
+```typescript
+{
+    "compilerOptions": {
+        "experimentalDecorators": true
+    }
+}
+
+```
+
+Javascript lacks a powerful `Reflection` like Java, as such decorators work a little differently to
+annotations. They need to be given access to all variables associated with what they are decorating
+as opposed to being able to examine its own behaviour at runtime.
+
+Decorators come in five flavours:
+
+-   Class decorators
+-   Method decorators
+-   Accessor decorators
+-   Property decorators
+-   Parameter decorators
+
+According to the Typescript documentation there is a well defined order to how decorators are
+applied at runtime:
+
+> 1. Parameter Decorators, followed by Method, Accessor, or Property Decorators are applied for each
+>    instance member.
+> 2. Parameter Decorators, followed by Method, Accessor, or Property Decorators are applied for each
+>    static member.
+> 3. Parameter Decorators are applied for the constructor.
+> 4. Class Decorators are applied for the class.
+
+### Decorator Factories
+
+The signature for each of the decorators is defined in the proposal. As such, there isn't much
+flexibility to allow developers to customise the inputs.
+
+A decorator factory is just a method which returns a decorator. This factory method can take in
+whatever parameters you'd like as long as it returns the appropriate decorator.
+
+## Class Decorators
+
+Class decorators are applied to an ES2015 class. It's given the class constructor as its only input.
+Class decorators are very powerful, they've the ability to return a different constructor method
+which will completely replace the class's own constructor.
+
+#### Signature
+
+```typescript
+ClassDecorator = <TFunction extends Function>(target: TFunction) => TFunction;
+```
+
+where:
+
+-   target = a Constructor function
+
+#### Example
+
+```typescript
+function JoeBloggs<T extends { new (...args: any[]): {} }>(constructor: T) {
+    return class extends constructor {
+      firstname = "Joe";
+      lastname = "Bloggs"
+   }
+
+@JoeBloggs
+class Me {
+  firstname = "Daniel";
+  lastname = "Sinnott"
+}
+
+const daniel = new Me();
+console.log(daniel.firstname);
+console.log(daniel.lastname);
+```
+
+The above decorator @JoeBloggs takes in a constructor and replaces it with its returned constructor.
+The names first & last names logged at the end are Joe & Bloggs.
+
+## Method Decorators
+
+Method decorators are applied above a method. It has the ability either modify a method's property
+descriptor or to return a completely new property descriptor which will be used instead.
+
+#### Signature
+
+```typescript
+MethodDecorator = <T>(target: Object, key: string, descriptor: TypedPropertyDescriptor<T>) => TypedPropertyDescriptor<T> | Void;
+```
+
+Where :
+
+-   target = constructor function of the class for a static method, or the prototype of the class
+    for an instance method.
+-   key = the name of the method
+-   descriptor = the property descriptor of the method
+
+#### Example
+
+```typescript
+function Enumerable(value: boolean) {
+    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+        descriptor.enumerable = value;
+    };
+}
+
+class Me {
+    @Enumerable(false)
+    title() {
+        return "Your Majesty";
+    }
+    @Enumerable(true)
+    firstname() {
+        return "Daniel";
+    }
+    @Enumerable(true)
+    lastname() {
+        return "Sinnott";
+    }
+}
+
+const Daniel = new Me();
+for (const prop in Daniel) {
+    console.log(prop);
+}
+```
+
+which creates a class with 3 methods which are non-enumerable by default, the added decorator
+specifies that firstname & lastname should be enumerable. The property loop logs "Daniel" &
+"Sinnott"
+
+## Accessor Decorators
+
+Accessor decorators all almost identical to method decorators. However, they can only be applied to
+either the `get` or `set` accessor methods, not both.
+
+## Property Decorators
+
+A Property Decorator is declared just before a class property declaration. Its used to observe that
+a property has been declared for a class.
+
+#### Signature
+
+```typescript
+PropertyDecorator = (target: Object, key: string) => Void;
+```
+
+Where :
+
+-   target = constructor function of the class for a static method, or the prototype of the class
+    for an instance method.
+-   key = the name of the property
+
+#### Example
+
+```typescript
+function Column(options: {type: string}) {
+    return function(object: Object, propertyName: string): void {
+      // Record database column meta data
+    };
+  }
+
+class Person {
+  @Column({type: "VARCHAR"})
+  firstname;
+
+  @Column({type: "VARCHAR"})
+  lastname;
+```
+
+the above example is snippit from my own ORM which is being converted to typescript & decorators to
+allow for a nicer developer experience. It defines a class & records the database metadata for each
+class property so that it can converted into a database table.
+
+## Parameter Decorators
+
+A Parameter Decorator is declared just before a function parameter declaration. The function can be
+a class constructor or a method.
+
+Parameter decorators are very similar in that they are mainly way of observing that a parameter has
+been declared. There isn't a huge amount you can do to the parameter in the decorator. Their power
+comes from the decorator order. You might remember from above that parameter decorators are
+evaluated first. It then possible to store parameter metadata so that it can then be used in a
+method decorator later in the decorator order.
+
+#### Signature
+
+```typescript
+ParameterDecorator = (target: Object, key: string, index: number) => Void;
+```
+
+where:
+
+-   target = constructor function of the class for a static method, or the prototype of the class
+    for an instance method.
+-   key = the name of the method
+-   index = the index of the parameter in the function's parameter list
+
+#### Example
+
+```typescript
+const LOGPARAMS = "LOGPARAMS";
+function LogParameter(object, methodName, index) {
+    if (!object[LOGPARAMS]) {
+        object[LOGPARAMS] = [];
+    }
+    object[LOGPARAMS].push(index);
+}
+
+function LogMethod(object, methodName, descriptor) {
+    const originalMethod = descriptor.value;
+    descriptor.value = function (...args) {
+        console.log(`Calling ${object.constructor.name}.${methodName}`);
+        console.log(`with logged params:`);
+        object[LOGPARAMS].reverse().forEach((index) => {
+            const paramValue = args[index];
+            console.log(`${paramValue}`);
+        });
+        return originalMethod.apply(this, args);
+    };
+}
+
+class Person {
+    fullname: string;
+    @LogMethod
+    setFullname(@LogParameter firstname, middlename, @LogParameter lastname) {
+        this.fullname = `${firstname} ${middlename} ${lastname}`;
+    }
+}
+
+const me = new Person();
+me.setFullname("Daniel", "Peter", "Sinnott");
+console.log(`Fullname is: ${me.fullname}`);
+```
+
+The above example specifies that it wants to log the method setFullname & the firstname and lastname
+parameters. The LogParameter decorator stores the the index of the params which it whats to log on
+the actual object.
+
+Then during the LogMethod decorator we replace the actual setFullname method which our own method
+which logs the name of the method & the parameter whose indexes we stored previous, and then finally
+delegates to the actual setFullname method.
+
+The example outputs:
+
+> Calling Person.setFullname with logged params: Daniel Sinnott Fullname is: Daniel Peter Sinnott
+
+[tc39 proposal]: https://tc39.github.io/proposal-decorators/

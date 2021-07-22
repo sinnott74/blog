@@ -1,0 +1,302 @@
+---
+title: State of the pagi-nation
+author: Daniel Sinnott
+imageurl: https://i.imgur.com/ietahcb.png
+id: 24
+tags:
+    - Technical
+    - ReactJS
+    - Pagination
+date: Mon, 10th Sep 2018
+created: 2018-09-10T21:45:36.462Z
+---
+
+## Adding pagination
+
+Having recently having added [Hero Images] to each blogpost, which get displayed on the blog list
+page, the size of this blog has greatly increased.
+
+Visiting danielsinnott.com will cause 57 requests and 1.2MB to be downloaded. This is unacceptable
+and is a problem that won't scale as the blogposts continue. Currently, every blogpost is displayed
+on the list page, causing every hero image to be downloaded.
+
+The solution to this problem is pagination.
+
+### Creating a pagination component
+
+We'll start this post off with a couple of assumptions.
+
+-   You're familiar with react & javascript (I'm going to assume a create react app / react-scripts
+    build set up)
+-   You have a react app which need so pagination
+-   The list of items you want to paginate, has it's own style that you'd like to keep
+
+#### Create the files
+
+Create a Pagination folder & 3 files:
+
+-   `index.js`
+-   `Pagination.jsx`
+-   `Pagination.css` (or `scss` if you've go Sass integrated into your build)
+
+#### index.js
+
+I like to always create an folder for each component and have that folder contain an `index.js`. It
+allows for neat grouping of related files but also take care of keeping the import of the component
+short as modules which import this component will automatically look for index.js when importing
+from a directory. e.g:
+
+```jsx
+import Pagination from "src/components/Pagination";
+```
+
+Our index.js is a simple a redirect file, that imports our component and then exports it:
+
+```jsx
+// index.js
+import Pagination from "./Pagination";
+export default Pagination;
+```
+
+#### Defining our Pagination.jsx
+
+I always begin a component by writing a skeleton & defining the component's input:
+
+```jsx
+// Pagination.jsx
+import React from "react";
+import PropTypes from "prop-types";
+import "./Pagination.css";
+
+export default class Pagination extends React.Component {
+    constructor(props) {}
+    render() {}
+}
+
+Pagination.propTypes = {
+    itemsPerPage: PropTypes.number.isRequired,
+    className: PropTypes.string,
+    children: PropTypes.arrayOf(PropTypes.node).isRequired,
+};
+```
+
+We've outlines a basic react component and with our `PropTypes` have documented that the component
+takes in a number `itemsPerPage`, a `className` which will will add to our paginated list and
+finally `children` which will be the items we are paginating.
+
+#### Displaying our items
+
+Lets add the code to display our reduced/paged list of items. We're `props.children` as our generic
+list of items to display. In the code below, we've added our `state` which storing only our
+`currentPage`.
+
+During `render`, we calculate how many pages we'll need and slice our children items array to only
+the items that should be displayed on that page. We the render our pages items in a `div` with the
+`className` prop so consumers can style the list appropriately.
+
+```jsx
+// Pagination.jsx
+import React from "react";
+import PropTypes from "prop-types";
+import "./Pagination.css";
+
+export default class Pagination extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            currentPage: 1,
+        };
+    }
+
+    render() {
+        const itemsPerPage = this.props.itemsPerPage || 6;
+        let items = React.Children.toArray(this.props.children);
+        const numPages = Math.round(items.length / itemsPerPage);
+        items = items.slice(
+            (this.state.currentPage - 1) * itemsPerPage,
+            this.state.currentPage * itemsPerPage,
+        );
+        return (
+            <div className="paginate">
+                <div className={this.props.className}>{items}</div>
+            </div>
+        );
+    }
+}
+
+Pagination.propTypes = {
+    itemsPerPage: PropTypes.number.isRequired,
+    className: PropTypes.string,
+};
+```
+
+### Adding page buttons
+
+Next, we'll add the buttons for controlling which pages are visible. The class will need some extra
+methods to user interaction. Below we add 3 methods, and bind them to pagination instance's `this`
+during the constructor. Add the following snippet:
+
+```jsx
+// Pagination.jsx
+export default class Pagination extends React.Component {
+  constructor(props) {
+    ...
+    this._onPreviousClick = this._onPreviousClick.bind(this);
+    this._onNextClick = this._onNextClick.bind(this);
+    this._setCurrentPage = this._setCurrentPage.bind(this);
+  }
+  ...
+  _onPreviousClick() {
+    this._setCurrentPage(this.state.currentPage - 1);
+  }
+
+  _onNextClick() {
+    this._setCurrentPage(this.state.currentPage + 1);
+  }
+
+  _setCurrentPage(page) {
+    if (page === this.state.currentPage) return;
+    this.setState({
+      currentPage: page
+    });
+  }
+  ...
+}
+```
+
+Next, we'll add the buttons to the DOM. Like previous blogposts, we'll be using the [React-MD]
+component library, whose `import` can be seen at the top of the snippet below. Then during `render`
+we check if we should be disabling the previous or next buttons, if we're on the first or last page
+respectively.
+
+```jsx
+// Pagination.jsx
+...
+import Button from "react-md/lib/Buttons/Button";
+
+export default class Pagination extends React.Component {
+  ...
+  render() {
+    ...
+    const previousDisabled = this.state.currentPage === 1 ? true : false;
+    const nextDisabled = this.state.currentPage === numPages ? true : false;
+
+    let pageButtons = [];
+    for (let i = 1; i <= numPages; i++) {
+      const isCurrent = i === this.state.currentPage ? true : false;
+      pageButtons.push(
+        <Button
+          flat={!isCurrent}
+          raised={isCurrent}
+          primary={isCurrent}
+          onClick={() => this.setCurrentPage(i)}
+          key={i}
+        >
+          {i}
+        </Button>
+      );
+    }
+
+    return (
+      <div className="paginate">
+        <div className={this.props.className}>{items}</div>
+        <div className="paginate__buttons">
+          <Button
+            icon
+            className="paginate__buttons-left"
+            tooltipLabel="Previous"
+            tooltipPosition="top"
+            tooltipDelay={1000}
+            disabled={previousDisabled}
+            onClick={this._onPreviousClick}
+          >
+            chevron_left
+          </Button>
+          <div className="paginate__numbuttons">{pageButtons}</div>
+          <Button
+            icon
+            className="paginate__buttons-right"
+            tooltipLabel="Next"
+            tooltipPosition="top"
+            tooltipDelay={1000}
+            disabled={nextDisabled}
+            onClick={this._onNextClick}
+          >
+            chevron_right
+          </Button>
+        </div>
+      </div>
+    );
+  }
+  ...
+```
+
+#### Scrolling to the top of the page
+
+When the user changes, page they expect to be brought to the top of the page so they can start read
+from the start. Unfortunately, we don't know where the top of the page is as the `Pagination`
+component could be used anywhere. We'll need to calculate it each time.
+
+To start we'll need a reference to the `paginate div`. We do this by creating a ref in the
+constructor and attaching it during rendering.
+
+On each page change, we calculate where the top left corner of the `paginate div` is and scroll the
+window to there.
+
+```jsx
+// Pagination.jsx
+...
+export default class Pagination extends React.Component {
+  constructor(props) {
+    ...
+    this.paginateTopRef = React.createRef();
+  }
+
+  render() {
+    ...
+    return (
+      <div className="paginate" ref={this.paginateTopRef}>
+      ...
+    );
+  }
+
+  _setCurrentPage(page) {
+    ...
+    const paginateClientRect = this.paginateTopRef.current.getBoundingClientRect();
+    window.scrollTo(paginateClientRect.x, paginateClientRect.y);
+  }
+}
+...
+```
+
+#### Adding style
+
+Finally we add some styles to our buttons to keep them inline and from overflowing:
+
+```css
+// Pagination.css
+.paginate__buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.paginate__numbuttons {
+    display: inline-flex;
+    overflow: auto;
+}
+```
+
+### Making a difference
+
+Before pagination, loading danielsinnott.com from clean took **57 requests & 1.2MB** to download,
+after adding pagination the page load has been reduced to **29 requests and only 480KB**. Thats a
+reduction of over 50% by adding a single component. I'd also argue that beyond the page load
+performance the user experience has improved.
+
+The full source for this can be see over at [Github]
+
+[hero images]: /blog/22
+[react-md]: https://react-md.mlaursen.com/
+[github]: https://github.com/sinnott74/BlogWebClient/tree/master/src/core/components/Pagination

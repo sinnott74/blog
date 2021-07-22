@@ -1,0 +1,15 @@
+{
+    "name": "blog",
+    "version": "0.0.1",
+    "description": "Blog",
+    "license": "MIT",
+    "private": true,
+    "workspaces": {
+        "packages": [
+            "packages/client"
+        ],
+        "nohoist": [
+            "**/*"
+        ]
+    }
+}

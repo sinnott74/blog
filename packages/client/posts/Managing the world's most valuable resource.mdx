@@ -1,0 +1,166 @@
+---
+title: Managing the world's most valuable resource
+author: Daniel Sinnott
+imageurl: https://i.imgur.com/qlIM4k7.png
+id: 10
+tags:
+    - Monthly Challenge
+    - Technical
+    - February
+    - Data
+    - SQL
+date: Thu, 1st Mar 2018
+created: 2018-03-01T23:58:12.714Z
+---
+
+The technical challenge for February, as outlined in [One month at a time], was to do a complete
+rewrite of the Data Access Layer for this blog.
+
+The goal was to end up with an ORM like infrastructure that would let me easily work with my data
+model.
+
+## Influences
+
+I browsed the source code of several javascript ORMs at the start of the month to gauge the size of
+the mountain I was about to climb. The 2 which stood out to me were:
+
+-   [Sequelize] is a well established ORM which contains all the bells & whistles. Its no wonder
+    that this package has been downloaded 900,000+ in the last month.
+-   [JugglingDB] impressed me with its simplicity. Its also no wonder that it became part of
+    StrongLoop's popular LoopBack framework.
+
+## Requirements
+
+-   Ability to define database Entities/Tables.
+-   Ability to easily perform CRUD operations on those entities.
+-   Ability to define & work with entity associations / relationships / foreign references.
+-   Efficient persisting of data
+
+---
+
+### Ability to define database Entities/Tables
+
+The following is my definition for my User entity. Based on this definition, a database table
+definition & A User constructor is created, with getters & setters for the defined attributes. Each
+entity will be automatically given a primary key of ID.
+
+ORM.define API is defined as follows
+
+```javascript
+ORM.define(ModelName, AttributeObject, Options)
+ModelName: <String> The name of the Model/Entity/Database table
+Attribute: <Object> Contains key value pairings of Model attribute name to attribute definition
+Options: <Object> Contains extra model options. Such as the custom attributes displayed below. The object is where the majority of the progressive enhancement to this infrastructure will take place. E.g. optimistic locking & temporal attributes (created_on & last_modified_on)
+```
+
+Custom Attributes allow for derived data to be accessible on the Model object.
+
+```javascript
+const ORM = require("sinnott-orm");
+const DataTypes = ORM.DataTypes;
+
+const User = ORM.define(
+    "user",
+    {
+        username: {
+            type: DataTypes.STRING,
+            length: 30,
+            notNull: true,
+            unique: true,
+        },
+        firstname: {
+            type: DataTypes.STRING,
+            length: 30,
+            notNull: true,
+        },
+        lastname: {
+            type: DataTypes.STRING,
+            length: 30,
+            notNull: true,
+        },
+        dob: {
+            type: DataTypes.TIMESTAMP,
+            notNull: true,
+        },
+    },
+    {
+        customAttributes: {
+            fullname: {
+                get: function () {
+                    return `${this.firstname} ${this.lastname}`;
+                },
+            },
+        },
+    },
+);
+```
+
+### Ability to easily perform CRUD operations on those entities
+
+The following is a snippet from this blog's BlogPostRouter. The post verb is responsible for
+creating a new BlogPost. Its as simple as creating a new BlogPost & saving it.
+
+```javascript
+router.post("/", async function (req, res) {
+    const blogpostData = { ...req.body };
+    const blogPost = new BlogPost(blogpostData);
+    await blogPost.save();
+    res.json(blogPost);
+});
+```
+
+The infrastructure knows this is a brand new BlogPost & sends an SQL INSERT command to the database.
+Any further modification to blogPost must also be persisted by calling save. This will result in an
+SQL update.
+
+### Ability to define & work with entity associations / relationships / foreign references
+
+The infrastructure allows for all three of the possible table relationships:
+
+-   One to One
+-   One to Many
+-   Many to One
+
+Below is an example of a One to Many relationship.
+
+```javascript
+User.oneToMany(BlogPost, { as: "author" });
+```
+
+We are defining a One to Many relationship between User & BlogPost. i.e A User can have many
+BlogPosts. A foreign key reference to User is added onto the BlogPost entity. The 'as' option is
+also defined, so we are saying the User associated with a BlogPost will be referred to as the
+Author.
+
+Below is an example of how to read a blog post & include is author. Calling save on the returned
+entity will attempt to save any changes to both the blogpost & the associated author.
+
+```javascript
+BlogPost.get(id, { includes: ["author"] });
+```
+
+### Efficient persisting of data
+
+Calling save on highly nested entities may result in a large number of SQL insert / modify commands
+being executed. This could be very resource consuming & inefficient. What is no attributes on the
+entities had changed?
+
+For this reason the ORM infrastructure has the concept of dirty data. It will only execute SQL
+commands for an entity when it contains attributes who's values changed since the entity was read
+from the database or who's values were input by the user. This not only reduces the number of SQL
+commands down to only what is necessary, but it reduces each individual SQL command down to updating
+only the attributes which have changed.
+
+---
+
+## Final Points
+
+The ORM infrastructure has been fully separated out from the Server directory into its own
+directory. This will allow me to update each independently.
+
+The ORM also nowhere near finished. This is the MVP for my Blog app, with the aim to progressively
+enhance the infrastructure as requirements see fit.
+
+[one month at a time]: /blog/6
+[sequelize]: https://github.com/sequelize/sequelize
+[jugglingdb]: https://github.com/1602/jugglingdb

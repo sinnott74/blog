@@ -1,0 +1,85 @@
+---
+title: Task, Microtasks & Automobiles
+author: Daniel Sinnott
+imageurl: https://i.imgur.com/BywnfLd.png
+id: 7
+tags:
+    - Javascript
+    - Concurrency
+date: Mon, 19th Feb 2018
+created: 2018-02-19T14:51:43.729Z
+---
+
+This blog post is based largely on Jake Archibald's ([@jaffathecake]) talk [In The Loop]
+
+## The Event Loop
+
+The event loop is how Javascript implements its concurrency model and allows it to perform multiple
+non blocking asynchronous operations despite the fact that it is single threaded. Each javascript
+thread gets it's own event loop. i.e. both the main thread & web workers get their own event loop as
+they are executed in their own thread.
+
+The event loop runs continually round executing tasks, mircotasks & even performing all render steps
+like style calculations, layout & paint.
+
+Note: Its possible for Pages to share an single event loop when they are on the same origin. This
+allows them to synchronously communicate. Examples of opening pages on the same origin are iframes,
+window.frames & pages opened with window.open(). Window.postMessage() can then be used to
+communicate from page to page. However opening a page with window.open() & passing the noopener
+option will prevent the child page from referencing the parent and also give it its own event loop.
+For more info see: [Shared Event-loop for Same-Origin Windows]
+
+## Tasks
+
+A task is a unit of work scheduled by the browser. Tasks are put into a task queue to ensure they
+are executed in the correct order, and can be put there from multiple sources. Examples of tasks
+include setTimeout & event clicks.
+
+Each iteration of the event loop will perform a single task, to completion. The thread is completely
+focused on completing this task. Long running tasks block page rendering and can cause the user to
+notice that the page is frozen.
+
+Tasks can queue other tasks, but as only a single task can be completed on each loop the browser is
+allowed to perform rendering in between tasks. A good example of this is setTimeout recursively
+queue setTimeouts. This doesn't block rendering.
+
+## Microtasks
+
+Microtasks are very similars to tasks. Like tasks, they are also placed in a queue by multiple
+sources. However microtasks position in the event loop is somewhat fluid. The event loop executes
+microtasks whenever the javascript callstack is empty. Which means microtasks can be executed after
+a task or even after a Request Animation Frame callback.
+
+Like Tasks Microtasks can queue other microtasks, but unlike tasks they are completed until the
+queue is empty. This means recursive microtasks can block rendering.
+
+Examples of microtasks include process.nextTick & Promises.
+
+## Render Steps
+
+The browser controls when the render steps are executed. It notifies the event loop that on the next
+iteration of the loop it should perform Style calculations, Layout & finally Paint the pixels on the
+screen. It aims to do this typically every 16.6ms or 60 frames per second.
+
+### Request Animation Frame
+
+Request Animation Frame (rAF) callbacks are called during the render steps, just before style
+calculations. Its an ideal place to perform UI specific updates & allows the batching of updates.
+
+rAF callbacks are executed until completion, including queued rAFs. However, the browser will take a
+break from executing queued rAFs when it hits a rAf which wasn't queued before this iteration of the
+loop.
+
+## Visuals
+
+Below is a visual representation of The Event Loop. All microtasks on the queue are executed
+everytime the javascript callstack is empty.
+![JavaScript Event Loop](https://i.imgur.com/yp6hsFd.gif "JavaScript Event Loop") Credit to
+([@jaffathecake])
+
+[@jaffathecake]: https://twitter.com/jaffathecake
+[in the loop]: https://www.youtube.com/watch?v=cCOL7MC4Pl0
+[spec]: https://html.spec.whatwg.org/multipage/webappapis.html#task-queue
+[shared event-loop for same-origin windows]:
+    http://hassansin.github.io/shared-event-loop-among-same-origin-windows
+[the event loop visualisation]: https://imgur.com/yp6hsFd

@@ -1,0 +1,89 @@
+---
+title: Divide and Conquer
+author: Daniel Sinnott
+imageurl: https://i.imgur.com/2Poehrs.png
+id: 21
+tags:
+    - Technical
+    - ExpressJS
+    - NGINX
+    - Microservices
+date: Mon, 9th Jul 2018
+created: 2018-07-09T16:17:22.885Z
+---
+
+## Monolith
+
+This application was originally designed as a monolith & built using [Cloud Foundry]'s NodeJS
+buildpack. The web client & the corresponding API calls were served by the same application. It
+allowed for an ease of development and straight forward deployment.
+
+## Designing for Scale
+
+The [Express documentation] recommends the use of a reverse proxy to deliver web client file and
+offloading any API calls to the express server.
+
+> A reverse proxy sits in front of a web app and performs supporting operations on the requests,
+> apart from directing requests to the app. It can handle error pages, compression, caching, serving
+> files, and load balancing among other things.
+>
+> Handing over tasks that do not require knowledge of application state to a reverse proxy frees up
+> Express to perform specialized application tasks. For this reason, it is recommended to run
+> Express behind a reverse proxy like Nginx or HAProxy in production.
+
+In essence, express should only be used as an API server as thats where it excels. Nodejs utilises a
+single thread and an event loop concurrency model to run its applications (See [Node event loop] for
+more). As such, we don't want our resources being consumed by compressing and serving static files.
+[NGINX] was designed perform these tasks.
+
+> NGINX is a free, open-source, high-performance HTTP server
+
+![Reverse Proxy](https://i.imgur.com/ZbQYWeA.png "Reverse Proxy")
+
+## Separation of Concerns
+
+Separating out the web server from the API server allows each to be developed separately. It also
+allows us to scale out each service independently of the other. For example, if we were to introduce
+a native mobile version of this application and it was to become extremely popular, we may need to
+deploy several more instances of the API server, but the nginx web client could be left as it is.
+
+This application has been split as described above. The client and server can be found at [Blog
+Webclient] and [Blog Server] respectively.
+
+All requests are currently routed through the NGINX server. Any request to /api/ is forwarded onto
+the API server using the following snippet from the web client's nginx.conf:
+
+```
+location /api/ {
+    proxy_pass <%= ENV["BACKEND_ADDR"] %>;
+}
+```
+
+BACKEND_ADDR is an environment variable which points to my backend server. This follows along the
+lines of the [12 Factor App].
+
+> The twelve-factor app stores config in environment variables (often shortened to env vars or env).
+> Env vars are easy to change between deploys without changing any code; unlike config files, there
+> is little chance of them being checked into the code repo accidentally; and unlike custom config
+> files, or other config mechanisms such as Java System Properties, they are a language- and
+> OS-agnostic standard.
+
+## Performance
+
+Webclient rendering has seen a 10% gain in performance from the change, which can be seen in graph
+below which compares data from [WebPageTest]. SinnottTest.eu-gb.mybluemix.net is the development
+application which is using this new architecture, which Sinnott.eu-gb.mybluemix.net is the old
+monolith.
+
+![Visual Progress](https://i.imgur.com/d8aeKvO.png "Visual Progress")
+![Resource Timings](https://i.imgur.com/tfnZv0n.png "Resource Timings")
+
+[cloud foundry]: https://www.cloudfoundry.org
+[express documentation]:
+    https://expressjs.com/en/advanced/best-practice-performance.html#use-a-reverse-proxy
+[nginx]: https://www.nginx.com/resources/wiki/
+[node event loop]: /blog/7
+[blog webclient]: https://github.com/sinnott74/BlogWebClient
+[blog server]: https://github.com/sinnott74/BlogServer
+[12 factor app]: https://12factor.net/
+[webpagetest]: https://www.webpagetest.org/

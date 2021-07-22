@@ -1,0 +1,806 @@
+---
+title: You're my Hero
+author: Daniel Sinnott
+imageurl: https://i.imgur.com/ZVaDnJx.png
+id: 22
+tags:
+    - Technical
+    - Golang
+date: Fri, 24th Aug 2018
+created: 2018-08-24T12:31:53.699Z
+---
+
+When I decided to redesign the home page of this blog to include an image with every post, I was
+faced with the reality that I'd need to have a new [Hero Image] for every post and that I'm not a
+graphic designer...
+
+> In web design, a hero image is a large web banner image, prominently placed on a web page,
+> generally in the front and center. The hero image is often the first visual element a visitor
+> encounters on the site; it presents an overview of the site's most important content.
+
+Having played around with [Gimp] for a few days it became readily apparent that I'd need a way to
+**create Hero images quickly** and with a consistent style. I'd need to build something. GUIs can
+take a long time to perfect so a quick and dirty command line utility was my best option. Lets [GO]!
+
+## Golang Command Line Utility
+
+![Golang](https://i.imgur.com/IcyLOyC.png "Golang")
+
+> Go is a statically typed, compiled language in the tradition of C, with memory safety, garbage
+> collection, structural typing, and CSP-style concurrency.
+
+### Getting Started
+
+#### Install Go
+
+Follow the instructions at [install Golang] for your operating system
+
+Go is the perfect language to create a command line utility. It compiles into a single binary, has a
+great standard library & excellent cross platform support.
+
+#### Install Cobra
+
+Although the standard library has everything we need to create our utility, we're going to use
+[Cobra] to simplify things. Cobra is a great tool and library used by the likes of Docker,
+Kubernetes and Openshift to create command line applications.
+
+To install Cobra run
+
+```go
+go get github.com/spf13/cobra/cobra
+```
+
+This will download the latest code from github to the directory `$GOPATH/src/github.com/spf13/cobra`
+(GOPATH defaults to
+$HOME/go if you haven't set it). It will also compile cobra into its binary and save that at `$GOPATH/bin`
+
+#### Install Vipslib
+
+[Vipslib] is an image processing library that we'll be using to resize our Hero icons. See [Install
+vipslib] for how to install for your operating system. We'll also need to run:
+
+```go
+go get github.com/DAddYE/vips
+```
+
+to install the Go bindings for Vipslib
+
+#### Creating the project
+
+Start by creating a folder Hero and CD into it. Assuming you have $GOPATH/bin on your $PATH, run:
+
+```go
+cobra init
+```
+
+This will create a LICENSE, a directory cmd containing a single file root.go and your main.go.
+
+main.go contains package main and function main (which is the starting point for every Go
+application), and the import of the generated command. The function main delegates to cmd.Execute &
+that's all we'll need to do in main.
+
+```go
+// main.go
+package main
+
+import "github.com/sinnott74/TestCmd/cmd"
+
+func main() {
+    cmd.Execute()
+}
+```
+
+The generated cmd/root.go will contain a lot more code but for this simple tool we can remove most
+of it. After trimming the fat we're left with:
+
+```go
+// cmd/root.go
+package cmd
+
+import (
+    "fmt"
+    "os"
+
+    "github.com/spf13/cobra"
+)
+
+// rootCmd represents the base command when called without any subcommands
+var rootCmd = &cobra.Command{
+    Use:   "Hero image creating utility",
+    Short: "Hero creates banner images quickly",
+    RunE: func(cmd *cobra.Command, args []string) error {
+        return nil
+    },
+}
+
+// Execute adds all child commands to the root command and sets flags appropriately.
+// This is called by main.main(). It only needs to happen once to the rootCmd.
+func Execute() {
+    if err := rootCmd.Execute(); err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+    }
+}
+
+func init() {
+}
+```
+
+### Creating our Hero Utility
+
+#### Adding command line arguments
+
+Like all good command line utilities we're going to need to take in some arguments. Our init
+function in cmd/root.go is the perfect place for this kind of set up work. init() is called when the
+package is first imported. Add the following:
+
+```go
+var (
+    out      string
+    bgColor  string
+    icons    []string
+    height   int
+    width    int
+    iconsize int
+)
+
+func init() {
+    rootCmd.PersistentFlags().StringVarP(&out, "output", "o", "./hero.png", "File to output")
+    rootCmd.PersistentFlags().StringVarP(&bgColor, "color", "c", "red", "Background color")
+    rootCmd.PersistentFlags().StringArrayVarP(&icons, "icons", "i", []string{}, "Icons")
+    rootCmd.PersistentFlags().IntVarP(&width, "width", "x", 960, "Max x coordinate of the hero - width of the hero")
+    rootCmd.PersistentFlags().IntVarP(&height, "height", "y", 480, "Max y coordinate of the hero - height of the hero")
+    rootCmd.PersistentFlags().IntVarP(&iconsize, "iconsize", "s", 300, "Width and height of the incons on the hero")
+}
+```
+
+This sets up all the arguments we'll need for now. We can now run the application and verify that
+all the arguments are there:
+
+```go
+$go run main.go -h
+
+Hero creates banner images quickly
+
+Usage:
+  Hero image creating utility [flags]
+
+Flags:
+  -c, --color string        Background color (default "red")
+  -y, --height int          Max y coordinate of the hero - height of the hero (default 480)
+  -h, --help                help for Hero
+  -i, --icons stringArray   Icons
+  -s, --iconsize int        Width and height of the incons on the hero (default 300)
+  -o, --output string       File to output (default "./hero.png")
+  -x, --width int           Max x coordinate of the hero - width of the hero (default 960)
+```
+
+`go run` compiles and runs a go application. Adding the -h flag to any go application that accepts
+arguments will show the help blurb.
+
+#### Creating the image
+
+To create an image in go we'll need to import the `image` package. Update our rootCmd's RunE
+function in cmd.go to the following.
+
+```go
+RunE: func(cmd *cobra.Command, args []string) error {
+
+    // Create the picture
+    pic := image.NewRGBA(image.Rect(0, 0, width, height))
+
+    // Create the file
+    outFile, err := os.Create(out)
+    if err != nil {
+        return err
+    }
+
+    // Write & encode the file
+    err = png.Encode(outFile, pic)
+    if err != nil {
+        return err
+    }
+    return nil
+},
+```
+
+We're now creating a new picture with the dimensions the user specifies with the command line
+arguments. We then create a file and write/encode the picture to disk. Running:
+
+```go
+go main.go
+```
+
+will by default create an tiny blank file `hero.png`. We haven't specified the color of any pixel
+yet, which for an RGBA image is R:0 G:0 B:0 A:0 - an invisible black pixel.
+
+#### Setting the color
+
+For our colors, we're going to stick to the [material design color palette]. Add the following
+snippet to the file to set up our color
+
+```go
+// Material Design colors
+var (
+    Red400        = color.RGBA{0xef, 0x53, 0x50, 0xff} // rgb(239, 83, 80)
+    Red500        = color.RGBA{0xf4, 0x43, 0x36, 0xff} // rgb(244, 67, 54)
+    Red600        = color.RGBA{0xe5, 0x39, 0x35, 0xff} // rgb(229, 57, 53)
+    Pink400       = color.RGBA{0xec, 0x40, 0x7a, 0xff} // rgb(236, 64, 122)
+    Pink500       = color.RGBA{0xe9, 0x1e, 0x63, 0xff} // rgb(233, 30, 99)
+    Pink600       = color.RGBA{0xd8, 0x1b, 0x60, 0xff} // rgb(216, 27, 96)
+    Purple400     = color.RGBA{0xab, 0x47, 0xbc, 0xff} // rgb(171, 71, 188)
+    Purple500     = color.RGBA{0x9c, 0x27, 0xb0, 0xff} // rgb(156, 39, 176)
+    Purple600     = color.RGBA{0x8e, 0x24, 0xaa, 0xff} // rgb(142, 36, 170)
+    DeepPurple400 = color.RGBA{0x7e, 0x57, 0xc2, 0xff} // rgb(126, 87, 194)
+    DeepPurple500 = color.RGBA{0x67, 0x3a, 0xb7, 0xff} // rgb(103, 58, 183)
+    DeepPurple600 = color.RGBA{0x5e, 0x35, 0xb1, 0xff} // rgb(94, 53, 177)
+    Indigo400     = color.RGBA{0x5c, 0x6b, 0xc0, 0xff} // rgb(92, 107, 192)
+    Indigo500     = color.RGBA{0x3f, 0x51, 0xb5, 0xff} // rgb(63, 81, 181)
+    Indigo600     = color.RGBA{0x39, 0x49, 0xab, 0xff} // rgb(57, 73, 171)
+    Blue400       = color.RGBA{0x42, 0xa5, 0xf5, 0xff} // rgb(66, 165, 245)
+    Blue500       = color.RGBA{0x21, 0x96, 0xf3, 0xff} // rgb(33, 150, 243)
+    Blue600       = color.RGBA{0x1e, 0x88, 0xe5, 0xff} // rgb(30, 136, 229)
+    LightBlue400  = color.RGBA{0x29, 0xb6, 0xf6, 0xff} // rgb(41, 182, 246)
+    LightBlue500  = color.RGBA{0x03, 0xa9, 0xf4, 0xff} // rgb(3, 169, 244)
+    LightBlue600  = color.RGBA{0x03, 0x9b, 0xe5, 0xff} // rgb(3, 155, 229)
+    Cyan400       = color.RGBA{0x26, 0xc6, 0xda, 0xff} // rgb(38, 198, 218)
+    Cyan500       = color.RGBA{0x00, 0xbc, 0xd4, 0xff} // rgb(0, 188, 212)
+    Cyan600       = color.RGBA{0x00, 0xac, 0xc1, 0xff} // rgb(0, 172, 193)
+    Teal400       = color.RGBA{0x26, 0xa6, 0x9a, 0xff} // rgb(38, 166, 154)
+    Teal500       = color.RGBA{0x00, 0x96, 0x88, 0xff} // rgb(0, 150, 136)
+    Teal600       = color.RGBA{0x00, 0x89, 0x7b, 0xff} // rgb(0, 137, 123)
+    Green400      = color.RGBA{0x66, 0xbb, 0x6a, 0xff} // rgb(102, 187, 106)
+    Green500      = color.RGBA{0x4c, 0xaf, 0x50, 0xff} // rgb(76, 175, 80)
+    Green600      = color.RGBA{0x43, 0xa0, 0x47, 0xff} // rgb(67, 160, 71)
+    LightGreen400 = color.RGBA{0x9c, 0xcc, 0x65, 0xff} // rgb(156, 204, 101)
+    LightGreen500 = color.RGBA{0x8b, 0xc3, 0x4a, 0xff} // rgb(139, 195, 74)
+    LightGreen600 = color.RGBA{0x7c, 0xb3, 0x42, 0xff} // rgb(124, 179, 66)
+    Lime400       = color.RGBA{0xd4, 0xe1, 0x57, 0xff} // rgb(212, 225, 87)
+    Lime500       = color.RGBA{0xcd, 0xdc, 0x39, 0xff} // rgb(205, 220, 57)
+    Lime600       = color.RGBA{0xc0, 0xca, 0x33, 0xff} // rgb(192, 202, 51)
+    Yellow500     = color.RGBA{0xff, 0xeb, 0x3b, 0xff} // rgb(255, 235, 59)
+    Yellow600     = color.RGBA{0xfd, 0xd8, 0x35, 0xff} // rgb(253, 216, 53)
+    Yellow700     = color.RGBA{0xfb, 0xc0, 0x2d, 0xff} // rgb(251, 192, 45)
+    Amber400      = color.RGBA{0xff, 0xca, 0x28, 0xff} // rgb(255, 202, 40)
+    Amber500      = color.RGBA{0xff, 0xc1, 0x07, 0xff} // rgb(255, 193, 7)
+    Amber600      = color.RGBA{0xff, 0xb3, 0x00, 0xff} // rgb(255, 179, 0)
+    Orange400     = color.RGBA{0xff, 0xa7, 0x26, 0xff} // rgb(255, 167, 38)
+    Orange500     = color.RGBA{0xff, 0x98, 0x00, 0xff} // rgb(255, 152, 0)
+    Orange600     = color.RGBA{0xfb, 0x8c, 0x00, 0xff} // rgb(251, 140, 0)
+    DeepOrange400 = color.RGBA{0xff, 0x70, 0x43, 0xff} // rgb(255, 112, 67)
+    DeepOrange500 = color.RGBA{0xff, 0x57, 0x22, 0xff} // rgb(255, 87, 34)
+    DeepOrange600 = color.RGBA{0xf4, 0x51, 0x1e, 0xff} // rgb(244, 81, 30)
+    Brown400      = color.RGBA{0x8d, 0x6e, 0x63, 0xff} // rgb(141, 110, 99)
+    Brown500      = color.RGBA{0x79, 0x55, 0x48, 0xff} // rgb(121, 85, 72)
+    Brown600      = color.RGBA{0x6d, 0x4c, 0x41, 0xff} // rgb(109, 76, 65)
+    Grey400       = color.RGBA{0xbd, 0xbd, 0xbd, 0xff} // rgb(189, 189, 189)
+    Grey500       = color.RGBA{0x9e, 0x9e, 0x9e, 0xff} // rgb(158, 158, 158)
+    Grey600       = color.RGBA{0x75, 0x75, 0x75, 0xff} // rgb(117, 117, 117)
+    BlueGrey400   = color.RGBA{0x78, 0x90, 0x9c, 0xff} // rgb(120, 144, 156)
+    BlueGrey500   = color.RGBA{0x60, 0x7d, 0x8b, 0xff} // rgb(96, 125, 139)
+    BlueGrey600   = color.RGBA{0x54, 0x6e, 0x7a, 0xff} // rgb(84, 110, 122)
+)
+
+// Map of Color Names to color
+var Map = make(map[string][3]color.RGBA)
+
+// Multiple init funcs are allowed
+func init() {
+    Map["red"] = [3]color.RGBA{Red400, Red500, Red600}
+    Map["pink"] = [3]color.RGBA{Pink400, Pink500, Pink600}
+    Map["purple"] = [3]color.RGBA{Purple400, Purple500, Purple600}
+    Map["deeppurple"] = [3]color.RGBA{DeepPurple400, DeepPurple500, DeepPurple600}
+    Map["indigo"] = [3]color.RGBA{Indigo400, Indigo500, Indigo600}
+    Map["blue"] = [3]color.RGBA{Blue400, Blue500, Blue600}
+    Map["lightblue"] = [3]color.RGBA{LightBlue400, LightBlue500, LightBlue600}
+    Map["cyan"] = [3]color.RGBA{Cyan400, Cyan500, Cyan600}
+    Map["teal"] = [3]color.RGBA{Teal400, Teal500, Teal600}
+    Map["green"] = [3]color.RGBA{Green400, Green500, Green600}
+    Map["lime"] = [3]color.RGBA{Lime400, Lime500, Lime600}
+    Map["yellow"] = [3]color.RGBA{Yellow500, Yellow600, Yellow700}
+    Map["amber"] = [3]color.RGBA{Amber400, Amber500, Amber600}
+    Map["orange"] = [3]color.RGBA{Orange400, Orange500, Orange600}
+    Map["deeporange"] = [3]color.RGBA{DeepOrange400, DeepOrange500, DeepOrange600}
+    Map["brown"] = [3]color.RGBA{Brown400, Brown500, Brown600}
+    Map["grey"] = [3]color.RGBA{Grey400, Grey500, Grey600}
+    Map["bluegrey"] = [3]color.RGBA{BlueGrey400, BlueGrey500, BlueGrey600}
+}
+
+// getColor gets a RGBA color
+func getColor(colorName *string) ([3]color.RGBA, error) {
+    colors, ok := Map[*colorName]
+    if !ok {
+        return [3]color.RGBA{}, fmt.Errorf("Color %s could not be found", *colorName)
+    }
+    return colors, nil
+}
+```
+
+You may have noticed from the Hero on this blogpost that our background has three sections, divided
+by two diagonal lines, increasing in darkness from left to right. To do this we need to loop through
+every pixel in the Hero and set the color based on which section it is in.
+
+We define a new type represent out diagonal lines - line. It consists of two points. Based on where
+each pixel is relative to the diagonal lines, we can set its color.
+
+```go
+type line struct {
+    p1 image.Point
+    p2 image.Point
+}
+
+// setImageColor sets the background color of an image
+func setImageColor(pic *image.RGBA, bgColor *string) error {
+
+    width := pic.Bounds().Max.X
+    height := pic.Bounds().Max.Y
+
+    leftLine := line{image.Point{width / 4, 0}, image.Point{width / 20, height}}
+    rightLine := line{image.Point{width, height - 2*height/3}, image.Point{width - width/3, height}}
+
+    colors, err := getColor(bgColor)
+    if err != nil {
+        return err
+    }
+
+    leftColor := colors[0]
+    middleColor := colors[1]
+    rightColor := colors[2]
+
+    // Update the colour of each pixel
+    for x := pic.Bounds().Min.X; x < pic.Bounds().Max.X; x++ {
+        for y := pic.Bounds().Min.Y; y < pic.Bounds().Max.Y; y++ {
+
+            p := image.Point{x, y}
+            if isLeftOfLine(leftLine, p) {
+                pic.Set(x, y, leftColor)
+            } else if isRightOfLine(rightLine, p) {
+                pic.Set(x, y, rightColor)
+            } else {
+                pic.Set(x, y, middleColor)
+            }
+        }
+    }
+    return nil
+}
+
+// isRightOfLine checks if a point is to the right of the line
+func isRightOfLine(l line, p image.Point) bool {
+    return !isLeftOfLine(l, p)
+}
+
+// isLeftOfLine checks if a point is to the left of the line
+func isLeftOfLine(l line, p image.Point) bool {
+    d := (p.X-l.p1.X)*(l.p2.Y-l.p1.Y) - (p.Y-l.p1.Y)*(l.p2.X-l.p1.X)
+    return d < 0
+}
+```
+
+We can now call our setImageColor function before we encode the png, without forgetting to check for
+errors.
+
+```go
+err = setImageColor(pic, &bgColor)
+if err != nil {
+    return err
+}
+```
+
+Now when we run
+
+```go
+go run main.go
+```
+
+We'll get a hero.png file with dimensions 960\*480 by default, with red background containing our
+pattern.
+
+![Red hero](https://i.imgur.com/yDqToGj.png "Red hero")
+
+### Adding icons
+
+To add our icons, we'll need to:
+
+-   Read them into memory
+-   Resize them
+-   Determine their position in the Hero
+-   Finally, add them to the Hero
+
+This can be accomplished with the following code:
+
+```go
+// addIcons add icons to the pic
+func addIcons(pic *image.RGBA, iconPaths []string, iconSize image.Point) error {
+
+    width := pic.Bounds().Max.X
+    height := pic.Bounds().Max.Y
+
+    numIcons := len(iconPaths)
+    horizonalPaddingNum := numIcons + 1
+    paddingWidth := (width - iconSize.Y*numIcons) / horizonalPaddingNum
+
+    for i, iconPath := range iconPaths {
+        icon, err := readIcon(&iconPath)
+        if err != nil {
+            return err
+        }
+        resizedIcon, err := resizeIcon(&icon, iconSize)
+        if err != nil {
+            return err
+        }
+
+        diff := iconSize.Sub(resizedIcon.Bounds().Max).Div(2)
+        offset := image.Pt(paddingWidth+iconSize.X*i+paddingWidth*i, height/2-iconSize.Y/2).Add(diff)
+        addIconToPic(pic, resizedIcon, offset)
+    }
+    return nil
+}
+
+// readIcon reads in the btyes of a given file
+func readIcon(iconPath *string) ([]byte, error) {
+
+    inBuf, err := ioutil.ReadFile(*iconPath)
+    if err != nil {
+        return nil, err
+    }
+    return inBuf, nil
+}
+
+// resizeIcon resizes the file
+func resizeIcon(icon *[]byte, iconSize image.Point) (image.Image, error) {
+    options := vips.Options{
+        Width:        iconSize.X,
+        Height:       iconSize.Y,
+        Crop:         false,
+        Extend:       vips.EXTEND_WHITE,
+        Interpolator: vips.BILINEAR,
+        Gravity:      vips.CENTRE,
+        Quality:      100,
+        Format:       vips.PNG,
+    }
+
+    buf, err := vips.Resize(*icon, options)
+    if err != nil {
+        return nil, err
+    }
+
+    resizedIcon, _, err := image.Decode(bytes.NewReader(buf))
+    if err != nil {
+        return nil, err
+    }
+
+    return resizedIcon, nil
+}
+
+// addIconToPic adds the icon to the picture
+func addIconToPic(pic draw.Image, icon image.Image, offset image.Point) {
+    draw.Draw(pic, icon.Bounds().Add(offset), icon, image.ZP, draw.Over)
+}
+```
+
+Add a call to addIcons after setImageColor in out rootCmd
+
+```go
+err = addIcons(pic, icons, image.Point{iconsize, iconsize})
+if err != nil {
+    return err
+}
+```
+
+#### Our Hero
+
+Finally run
+
+```go
+go run main.go -i hero_icon.png -i gopher.png -c blue
+```
+
+where hero_icon.png and gopher.png are images on your system, will create our **HERO!**
+
+![Hero](https://i.imgur.com/ZVaDnJx.png "Hero")
+
+#### The full source of root.go can be seen below
+
+```go
+package cmd
+
+import (
+    "bytes"
+    "fmt"
+    "image"
+    "image/color"
+    "image/draw"
+    "image/png"
+    "io/ioutil"
+    "os"
+
+    "github.com/DAddYE/vips"
+    "github.com/spf13/cobra"
+)
+
+// Command line arguments
+var (
+    out      string
+    bgColor  string
+    icons    []string
+    height   int
+    width    int
+    iconsize int
+)
+
+// Material Design colors
+var (
+    Red400        = color.RGBA{0xef, 0x53, 0x50, 0xff} // rgb(239, 83, 80)
+    Red500        = color.RGBA{0xf4, 0x43, 0x36, 0xff} // rgb(244, 67, 54)
+    Red600        = color.RGBA{0xe5, 0x39, 0x35, 0xff} // rgb(229, 57, 53)
+    Pink400       = color.RGBA{0xec, 0x40, 0x7a, 0xff} // rgb(236, 64, 122)
+    Pink500       = color.RGBA{0xe9, 0x1e, 0x63, 0xff} // rgb(233, 30, 99)
+    Pink600       = color.RGBA{0xd8, 0x1b, 0x60, 0xff} // rgb(216, 27, 96)
+    Purple400     = color.RGBA{0xab, 0x47, 0xbc, 0xff} // rgb(171, 71, 188)
+    Purple500     = color.RGBA{0x9c, 0x27, 0xb0, 0xff} // rgb(156, 39, 176)
+    Purple600     = color.RGBA{0x8e, 0x24, 0xaa, 0xff} // rgb(142, 36, 170)
+    DeepPurple400 = color.RGBA{0x7e, 0x57, 0xc2, 0xff} // rgb(126, 87, 194)
+    DeepPurple500 = color.RGBA{0x67, 0x3a, 0xb7, 0xff} // rgb(103, 58, 183)
+    DeepPurple600 = color.RGBA{0x5e, 0x35, 0xb1, 0xff} // rgb(94, 53, 177)
+    Indigo400     = color.RGBA{0x5c, 0x6b, 0xc0, 0xff} // rgb(92, 107, 192)
+    Indigo500     = color.RGBA{0x3f, 0x51, 0xb5, 0xff} // rgb(63, 81, 181)
+    Indigo600     = color.RGBA{0x39, 0x49, 0xab, 0xff} // rgb(57, 73, 171)
+    Blue400       = color.RGBA{0x42, 0xa5, 0xf5, 0xff} // rgb(66, 165, 245)
+    Blue500       = color.RGBA{0x21, 0x96, 0xf3, 0xff} // rgb(33, 150, 243)
+    Blue600       = color.RGBA{0x1e, 0x88, 0xe5, 0xff} // rgb(30, 136, 229)
+    LightBlue400  = color.RGBA{0x29, 0xb6, 0xf6, 0xff} // rgb(41, 182, 246)
+    LightBlue500  = color.RGBA{0x03, 0xa9, 0xf4, 0xff} // rgb(3, 169, 244)
+    LightBlue600  = color.RGBA{0x03, 0x9b, 0xe5, 0xff} // rgb(3, 155, 229)
+    Cyan400       = color.RGBA{0x26, 0xc6, 0xda, 0xff} // rgb(38, 198, 218)
+    Cyan500       = color.RGBA{0x00, 0xbc, 0xd4, 0xff} // rgb(0, 188, 212)
+    Cyan600       = color.RGBA{0x00, 0xac, 0xc1, 0xff} // rgb(0, 172, 193)
+    Teal400       = color.RGBA{0x26, 0xa6, 0x9a, 0xff} // rgb(38, 166, 154)
+    Teal500       = color.RGBA{0x00, 0x96, 0x88, 0xff} // rgb(0, 150, 136)
+    Teal600       = color.RGBA{0x00, 0x89, 0x7b, 0xff} // rgb(0, 137, 123)
+    Green400      = color.RGBA{0x66, 0xbb, 0x6a, 0xff} // rgb(102, 187, 106)
+    Green500      = color.RGBA{0x4c, 0xaf, 0x50, 0xff} // rgb(76, 175, 80)
+    Green600      = color.RGBA{0x43, 0xa0, 0x47, 0xff} // rgb(67, 160, 71)
+    LightGreen400 = color.RGBA{0x9c, 0xcc, 0x65, 0xff} // rgb(156, 204, 101)
+    LightGreen500 = color.RGBA{0x8b, 0xc3, 0x4a, 0xff} // rgb(139, 195, 74)
+    LightGreen600 = color.RGBA{0x7c, 0xb3, 0x42, 0xff} // rgb(124, 179, 66)
+    Lime400       = color.RGBA{0xd4, 0xe1, 0x57, 0xff} // rgb(212, 225, 87)
+    Lime500       = color.RGBA{0xcd, 0xdc, 0x39, 0xff} // rgb(205, 220, 57)
+    Lime600       = color.RGBA{0xc0, 0xca, 0x33, 0xff} // rgb(192, 202, 51)
+    Yellow500     = color.RGBA{0xff, 0xeb, 0x3b, 0xff} // rgb(255, 235, 59)
+    Yellow600     = color.RGBA{0xfd, 0xd8, 0x35, 0xff} // rgb(253, 216, 53)
+    Yellow700     = color.RGBA{0xfb, 0xc0, 0x2d, 0xff} // rgb(251, 192, 45)
+    Amber400      = color.RGBA{0xff, 0xca, 0x28, 0xff} // rgb(255, 202, 40)
+    Amber500      = color.RGBA{0xff, 0xc1, 0x07, 0xff} // rgb(255, 193, 7)
+    Amber600      = color.RGBA{0xff, 0xb3, 0x00, 0xff} // rgb(255, 179, 0)
+    Orange400     = color.RGBA{0xff, 0xa7, 0x26, 0xff} // rgb(255, 167, 38)
+    Orange500     = color.RGBA{0xff, 0x98, 0x00, 0xff} // rgb(255, 152, 0)
+    Orange600     = color.RGBA{0xfb, 0x8c, 0x00, 0xff} // rgb(251, 140, 0)
+    DeepOrange400 = color.RGBA{0xff, 0x70, 0x43, 0xff} // rgb(255, 112, 67)
+    DeepOrange500 = color.RGBA{0xff, 0x57, 0x22, 0xff} // rgb(255, 87, 34)
+    DeepOrange600 = color.RGBA{0xf4, 0x51, 0x1e, 0xff} // rgb(244, 81, 30)
+    Brown400      = color.RGBA{0x8d, 0x6e, 0x63, 0xff} // rgb(141, 110, 99)
+    Brown500      = color.RGBA{0x79, 0x55, 0x48, 0xff} // rgb(121, 85, 72)
+    Brown600      = color.RGBA{0x6d, 0x4c, 0x41, 0xff} // rgb(109, 76, 65)
+    Grey400       = color.RGBA{0xbd, 0xbd, 0xbd, 0xff} // rgb(189, 189, 189)
+    Grey500       = color.RGBA{0x9e, 0x9e, 0x9e, 0xff} // rgb(158, 158, 158)
+    Grey600       = color.RGBA{0x75, 0x75, 0x75, 0xff} // rgb(117, 117, 117)
+    BlueGrey400   = color.RGBA{0x78, 0x90, 0x9c, 0xff} // rgb(120, 144, 156)
+    BlueGrey500   = color.RGBA{0x60, 0x7d, 0x8b, 0xff} // rgb(96, 125, 139)
+    BlueGrey600   = color.RGBA{0x54, 0x6e, 0x7a, 0xff} // rgb(84, 110, 122)
+)
+
+// Map of Color Names to color
+var Map = make(map[string][3]color.RGBA)
+
+// Multiple init funcs are allowed
+func init() {
+    Map["red"] = [3]color.RGBA{Red400, Red500, Red600}
+    Map["pink"] = [3]color.RGBA{Pink400, Pink500, Pink600}
+    Map["purple"] = [3]color.RGBA{Purple400, Purple500, Purple600}
+    Map["deeppurple"] = [3]color.RGBA{DeepPurple400, DeepPurple500, DeepPurple600}
+    Map["indigo"] = [3]color.RGBA{Indigo400, Indigo500, Indigo600}
+    Map["blue"] = [3]color.RGBA{Blue400, Blue500, Blue600}
+    Map["lightblue"] = [3]color.RGBA{LightBlue400, LightBlue500, LightBlue600}
+    Map["cyan"] = [3]color.RGBA{Cyan400, Cyan500, Cyan600}
+    Map["teal"] = [3]color.RGBA{Teal400, Teal500, Teal600}
+    Map["green"] = [3]color.RGBA{Green400, Green500, Green600}
+    Map["lime"] = [3]color.RGBA{Lime400, Lime500, Lime600}
+    Map["yellow"] = [3]color.RGBA{Yellow500, Yellow600, Yellow700}
+    Map["amber"] = [3]color.RGBA{Amber400, Amber500, Amber600}
+    Map["orange"] = [3]color.RGBA{Orange400, Orange500, Orange600}
+    Map["deeporange"] = [3]color.RGBA{DeepOrange400, DeepOrange500, DeepOrange600}
+    Map["brown"] = [3]color.RGBA{Brown400, Brown500, Brown600}
+    Map["grey"] = [3]color.RGBA{Grey400, Grey500, Grey600}
+    Map["bluegrey"] = [3]color.RGBA{BlueGrey400, BlueGrey500, BlueGrey600}
+}
+
+// rootCmd represents the base command when called without any subcommands
+var rootCmd = &cobra.Command{
+    Use:   "Hero image creating utility",
+    Short: "Hero creates banner images quickly",
+    RunE: func(cmd *cobra.Command, args []string) error {
+
+        // Create the picture
+        pic := image.NewRGBA(image.Rect(0, 0, width, height))
+
+        // Create the file
+        outFile, err := os.Create(out)
+        if err != nil {
+            return err
+        }
+
+        err = setImageColor(pic, &bgColor)
+        if err != nil {
+            return err
+        }
+
+        err = addIcons(pic, icons, image.Point{iconsize, iconsize})
+        if err != nil {
+            return err
+        }
+
+        // Encode & Write the file
+        err = png.Encode(outFile, pic)
+        if err != nil {
+            return err
+        }
+        return nil
+    },
+}
+
+// Execute adds all child commands to the root command and sets flags appropriately.
+// This is called by main.main(). It only needs to happen once to the rootCmd.
+func Execute() {
+    if err := rootCmd.Execute(); err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+    }
+}
+
+func init() {
+    rootCmd.PersistentFlags().StringVarP(&out, "output", "o", "./hero.png", "File to output")
+    rootCmd.PersistentFlags().StringVarP(&bgColor, "color", "c", "red", "Background color")
+    rootCmd.PersistentFlags().StringArrayVarP(&icons, "icons", "i", []string{}, "Icons")
+    rootCmd.PersistentFlags().IntVarP(&width, "width", "x", 960, "Max x coordinate of the hero - width of the hero")
+    rootCmd.PersistentFlags().IntVarP(&height, "height", "y", 480, "Max y coordinate of the hero - height of the hero")
+    rootCmd.PersistentFlags().IntVarP(&iconsize, "iconsize", "s", 300, "Width and height of the incons on the hero")
+}
+
+type line struct {
+    p1 image.Point
+    p2 image.Point
+}
+
+// setImageColor sets the background color of an image
+func setImageColor(pic *image.RGBA, bgColor *string) error {
+
+    width := pic.Bounds().Max.X
+    height := pic.Bounds().Max.Y
+
+    leftLine := line{image.Point{width / 4, 0}, image.Point{width / 20, height}}
+    rightLine := line{image.Point{width, height - 2*height/3}, image.Point{width - width/3, height}}
+
+    colors, err := getColor(bgColor)
+    if err != nil {
+        return err
+    }
+
+    leftColor := colors[0]
+    middleColor := colors[1]
+    rightColor := colors[2]
+
+    // Update the colour of each pixel
+    for x := pic.Bounds().Min.X; x < pic.Bounds().Max.X; x++ {
+        for y := pic.Bounds().Min.Y; y < pic.Bounds().Max.Y; y++ {
+
+            p := image.Point{x, y}
+            if isLeftOfLine(leftLine, p) {
+                pic.Set(x, y, leftColor)
+            } else if isRightOfLine(rightLine, p) {
+                pic.Set(x, y, rightColor)
+            } else {
+                pic.Set(x, y, middleColor)
+            }
+        }
+    }
+    return nil
+}
+
+// getColor gets a RGBA color
+func getColor(colorName *string) ([3]color.RGBA, error) {
+    colors, ok := Map[*colorName]
+    if !ok {
+        return [3]color.RGBA{}, fmt.Errorf("Color %s could not be found", *colorName)
+    }
+    return colors, nil
+}
+
+// isRightOfLine checks if a point is to the right of the line
+func isRightOfLine(l line, p image.Point) bool {
+    return !isLeftOfLine(l, p)
+}
+
+// isLeftOfLine checks if a point is to the left of the line
+func isLeftOfLine(l line, p image.Point) bool {
+    d := (p.X-l.p1.X)*(l.p2.Y-l.p1.Y) - (p.Y-l.p1.Y)*(l.p2.X-l.p1.X)
+    return d < 0
+}
+
+// addIcons add icons to the pic
+func addIcons(pic *image.RGBA, iconPaths []string, iconSize image.Point) error {
+
+    width := pic.Bounds().Max.X
+    height := pic.Bounds().Max.Y
+
+    numIcons := len(iconPaths)
+    horizonalPaddingNum := numIcons + 1
+    paddingWidth := (width - iconSize.Y*numIcons) / horizonalPaddingNum
+
+    for i, iconPath := range iconPaths {
+        icon, err := readIcon(&iconPath)
+        if err != nil {
+            return err
+        }
+        resizedIcon, err := resizeIcon(&icon, iconSize)
+        if err != nil {
+            return err
+        }
+
+        diff := iconSize.Sub(resizedIcon.Bounds().Max).Div(2)
+        offset := image.Pt(paddingWidth+iconSize.X*i+paddingWidth*i, height/2-iconSize.Y/2).Add(diff)
+        addIconToPic(pic, resizedIcon, offset)
+    }
+    return nil
+}
+
+// readIcon reads in the btyes of a given file
+func readIcon(iconPath *string) ([]byte, error) {
+
+    inBuf, err := ioutil.ReadFile(*iconPath)
+    if err != nil {
+        return nil, err
+    }
+    return inBuf, nil
+}
+
+// resizeIcon resizes the file
+func resizeIcon(icon *[]byte, iconSize image.Point) (image.Image, error) {
+    options := vips.Options{
+        Width:        iconSize.X,
+        Height:       iconSize.Y,
+        Crop:         false,
+        Extend:       vips.EXTEND_WHITE,
+        Interpolator: vips.BILINEAR,
+        Gravity:      vips.CENTRE,
+        Quality:      100,
+        Format:       vips.PNG,
+    }
+
+    buf, err := vips.Resize(*icon, options)
+    if err != nil {
+        return nil, err
+    }
+
+    resizedIcon, _, err := image.Decode(bytes.NewReader(buf))
+    if err != nil {
+        return nil, err
+    }
+
+    return resizedIcon, nil
+}
+
+// addIconToPic adds the icon to the picture
+func addIconToPic(pic draw.Image, icon image.Image, offset image.Point) {
+    draw.Draw(pic, icon.Bounds().Add(offset), icon, image.ZP, draw.Over)
+}
+
+```
+
+[hero image]: https://en.wikipedia.org/wiki/Hero_image
+[gimp]: https://www.gimp.org/
+[go]: https://golang.org/
+[cobra]: https://github.com/spf13/cobra
+[vipslib]: https://jcupitt.github.io/libvips/
+[install vipslib]: https://jcupitt.github.io/libvips/install.html
+[install golang]: https://golang.org/doc/install#install
+[material design color palette]: https://material.io/design/color/the-color-system.html',

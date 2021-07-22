@@ -1,0 +1,181 @@
+---
+title: Come to the darkside
+author: Daniel Sinnott
+imageurl: https://i.imgur.com/mbaXHXs.png
+id: 23
+tags:
+    - Technical
+    - ReactJS
+    - IBMCloud
+    - ReduxJS
+    - Sass
+date: Fri, 7th Sep 2018
+created: 2018-09-07T15:13:42.270Z
+---
+
+## Dark theme
+
+With youtube recently adding a dark mode to to their Polymer web app and rolling this feature out to
+their android app in the last couple of days, I felt it was time to add a dark mode here. If you
+spend as much time looking at a screen as me than you'll know that dark themes are a god send. They
+can reduce the strain on your eyes and can even help those that struggle to get to sleep at night.
+
+![Youtube dark theme](https://i.imgur.com/pkaHIPA.png "Youtube dark theme")
+
+This update to the blog can be seen in the commit - [312c69e]
+
+## Adding the Setting
+
+Firstly we need a way for the user to toggle the dark theme. A new settings page was added to house
+the dark theme toggle and all future settings, oh the possibilities!
+
+### Settings component
+
+Our settings component will have a single toggle switch that will control the dark theme. We're
+using [React-MD] which nicely implements the Material Design spec & allows for a lot of style
+customisation.
+
+The component is fairly simple. As you can see from the `PropTypes`, it takes in the boolean value
+for the dark theme & a function to call when the theme is when the theme is toggled. This component
+is very much just a dumb view.
+
+```jsx
+// settings.component.jsx
+import React from "react";
+import PropTypes from "prop-types";
+import "./Settings.css";
+import Switch from "react-md/lib/SelectionControls/Switch";
+
+export default class Settings extends React.Component {
+    render() {
+        return (
+            <div className="settings">
+                <Switch
+                    id="darkTheme"
+                    type="switch"
+                    label="Dark theme"
+                    name="darkTheme"
+                    labelBefore
+                    checked={this.props.darkTheme}
+                    onChange={this.props.handleDarkThemeChange}
+                />
+            </div>
+        );
+    }
+}
+
+Settings.propTypes = {
+    darkTheme: PropTypes.bool,
+    handleDarkThemeChange: PropTypes.func.isRequired,
+};
+```
+
+### Adding some logic and state
+
+The components logic and stage is wired up using [ReduxJS]. We're using `mapStateToProps` to wire up
+the dark theme value stored in the state to the `darkTheme` value passed into the component. Next
+`mapDispatchToProps` specifies that we should dispatch the `toggleDarkTheme` function when our
+components calls the `handleDarkThemeChange` function.
+
+```jsx
+// settings.container.jsx
+import Settings from "core/components/Settings";
+import { connect } from "react-redux";
+import { isDarkTheme, toggleDarkTheme } from "core/ducks/settings";
+
+const mapStateToProps = (state) => ({
+    darkTheme: isDarkTheme(state),
+});
+
+const mapDispatchToProps = {
+    handleDarkThemeChange: toggleDarkTheme,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Settings);
+```
+
+The settings redux file is following the [Ducks pattern] & includes a reducer registry as a nice way
+to load reducers into the redux store asynchronously.
+
+As reducers go, it's a fairly simple one. There's only one action, which is to toggle them dark
+mode. The value of the dark theme is initially read from local storage and persisted back there
+every time its toggled.
+
+```js
+// settings.ducks.js
+import reducerRegistry from "core/redux/ReducerRegistry";
+
+/*
+ * Sidenav actions
+ */
+const TOGGLE_DARKTHEME = "TOGGLE_DARKTHEME";
+
+/**
+ * Reducer
+ */
+let initialState = {
+    darkTheme: localStorage.getItem("darkTheme") === "true" || false,
+};
+
+export default function reducer(state = initialState, action) {
+    switch (action.type) {
+        case TOGGLE_DARKTHEME:
+            let darkTheme = !state.darkTheme;
+            localStorage.setItem("darkTheme", darkTheme);
+            return {
+                ...state,
+                darkTheme: darkTheme,
+            };
+        default:
+            return state;
+    }
+}
+
+/**
+ * Action Creators
+ */
+export function toggleDarkTheme() {
+    return {
+        type: TOGGLE_DARKTHEME,
+    };
+}
+
+/**
+ * Selectors
+ */
+export function isDarkTheme(state) {
+    return state.settings.darkTheme;
+}
+
+reducerRegistry.register("settings", reducer);
+```
+
+## Getting stylish
+
+My root component - `App.jsx` is connected to the settings store and updates whenever the
+`darkTheme` value updates. It simply adds a `.dark` class to the HTML element whenever darkTheme is
+set. Various other sass files were updates to take this class into account.
+
+The background colour and the text colour needed to be updated depending on the theme. E.g.
+
+```css
+// sass card component example with dark theme
+@import "core/style/variable";
+.card {
+    background: $background-color-light;
+}
+
+.dark .card {
+    background: $background-color-dark;
+}
+```
+
+## Let there be dark
+
+![Dark theme demo](https://i.imgur.com/hDqtIAA.gif "Dark theme demo")
+
+[312c69e]:
+    https://github.com/sinnott74/BlogWebClient/commit/312c69e8df3c3ff69d6a1ba782380752af2c6d30
+[react-md]: https://react-md.mlaursen.com/
+[reduxjs]: https://redux.js.org/
+[ducks pattern]: https://medium.com/@scbarrus/the-ducks-file-structure-for-redux-d63c41b7035c

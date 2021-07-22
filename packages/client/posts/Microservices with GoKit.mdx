@@ -1,0 +1,564 @@
+---
+title: Microservices with GoKit
+author: Daniel Sinnott
+imageurl: https://i.imgur.com/4Ep7VSO.png
+id: 26
+tags:
+    - Technical
+    - Microservices
+    - Golang
+    - GoKit
+date: Fri, 2nd Nov 2018
+created: 2018-11-02T20:27:52.341Z
+---
+
+## Todo Microservice
+
+### Go
+
+[Golang] is the perfect language to use for microservices.
+
+-   It compiles to a single binary, making deployment a breeze.
+-   It has incredibly low runtime memory.
+-   C & C++ like performance with built in concurrency primitives.
+-   Its standard library supports request cancellation and timeout propagation. Which means less cpu
+    cycles if a user cancels or if something is taking too long.
+-   Both Docker & Kubernetes are written in Go.
+
+#### Installation
+
+To install Go, follow the instruction for your platform here: [Go Installation]
+
+### GoKit
+
+[GoKit] is a lightly opinionated microservice toolkit. It allows developers to focus on writing the
+business logic of their service and plug in transport protocols such as http or gRPC etc, service
+discovery, logging and metrics.
+
+Its been criticised for the amount of boilerplate code that needs to be written, and it is quite
+daunting on first impression, but this verbosity allows for greater control in the long run. If
+you're new to GoKit its worth checking out the [stringsvc example].
+
+#### Installation
+
+GoKit can be installed using Go's idiomatic library installation command:
+
+```go
+go get github.com/go-kit/kit
+```
+
+### Business Logic
+
+#### Our Todo
+
+Create a file `model.go` to define our Todo. Our `Todo` is can be simply modelled like below. Feel
+free to add whatever attributes you'd like. We're using Struct tags to define what each Todo
+attribute will be named when its converted to JSON. The built in JSON encoder will use reflection to
+look for these tags, otherwise it'll use the attribute name as its defined in Go.
+
+```go
+// model.go
+package todo
+
+import (
+	"time"
+)
+
+// Todo model
+type Todo struct {
+	ID        string    `json:"id"`
+	Username  string    `json:"username"`
+	Text      string    `json:"text"`
+	Completed bool      `json:"completed"`
+	CreatedOn time.Time `json:"created_on"`
+}
+
+```
+
+#### Define our service
+
+Create a file `service.go`. This is going to contain our business logic. Its going to be a single
+InMemory CRUD Todo service. First we'll define an interface for our service. This will allow us to
+easily swap out the implementation later if we want to, for example, store our Todos in a
+database/datastore.
+
+Our Todo service is a basically a CRUD service for Todos.
+
+```go
+// service.go
+package todo
+
+import (
+	"context"
+)
+
+// TodoService for Todos
+type TodoService interface {
+	GetAllForUser(ctx context.Context, username string) ([]Todo, error)
+	GetByID(ctx context.Context, id string) (Todo, error)
+	Add(ctx context.Context, todo Todo) (Todo, error)
+	Update(ctx context.Context, id string, todo Todo) error
+	Delete(ctx context.Context, id string) error
+}
+```
+
+#### Implementation
+
+Next, we'll implement our service using an InMemory datastore. Go uses duck typing, so If it walks
+like a duck and it quacks like a duck, then it must be a duck. There's no need to explicitly say
+we're implementing the interface, e.g. Java.
+
+We'll added a `RWMutex` to lock the map and prevent concurrent access from multiple threads. The
+constructor function `NewInmemTodoService` instantiates our service.
+
+```go
+// service.go
+package todo
+
+import (
+	"context"
+	"errors"
+	"math/rand"
+	"sync"
+	"time"
+
+	"github.com/rs/xid"
+)
+
+// TodoService for Todos
+type TodoService interface {
+	GetAllForUser(ctx context.Context, username string) ([]Todo, error)
+	GetByID(ctx context.Context, id string) (Todo, error)
+	Add(ctx context.Context, todo Todo) (Todo, error)
+	Update(ctx context.Context, id string, todo Todo) error
+	Delete(ctx context.Context, id string) error
+}
+
+// *** Implementation ***
+
+var (
+	// ErrInconsistentIDs is when the ID of the Entity you are updating differs from the ID given
+	ErrInconsistentIDs = errors.New("Inconsistent IDs")
+	// ErrNotFound is when the Entity doesn't exist
+	ErrNotFound = errors.New("Not found")
+)
+
+// NewInmemTodoService creates an in memory Todo service
+func NewInmemTodoService() TodoService {
+	s := &inmemService{
+		m: map[string]Todo{},
+	}
+	rand.Seed(time.Now().UnixNano())
+	return s
+}
+
+// inmemService is a In Memory implementation of the service
+type inmemService struct {
+	sync.RWMutex
+	m map[string]Todo
+}
+
+// GetAllForUser gets Todos from memory for a user
+func (s *inmemService) GetAllForUser(ctx context.Context, username string) ([]Todo, error) {
+	s.RLock()
+	defer s.RUnlock()
+
+	todos := make([]Todo, 0, len(s.m))
+	for _, todo := range s.m {
+		if todo.Username == username {
+			todos = append(todos, todo)
+		}
+	}
+
+	return todos, nil
+}
+
+// Get an Todos from the database
+func (s *inmemService) GetByID(ctx context.Context, id string) (Todo, error) {
+	s.Lock()
+	defer s.Unlock()
+
+	if todo, ok := s.m[id]; ok {
+		return todo, nil
+	}
+
+	return Todo{}, ErrNotFound
+}
+
+// Add a Todo to memory
+func (s *inmemService) Add(ctx context.Context, todo Todo) (Todo, error) {
+	s.Lock()
+	defer s.Unlock()
+
+	todo.ID = xid.New().String()
+	todo.CreatedOn = time.Now()
+
+	s.m[todo.ID] = todo
+	return todo, nil
+}
+
+// Update a Todo in memory
+func (s *inmemService) Update(ctx context.Context, id string, todo Todo) error {
+	s.Lock()
+	defer s.Unlock()
+
+	if id != todo.ID {
+		return ErrInconsistentIDs
+	}
+
+	if _, ok := s.m[id]; !ok {
+		return ErrNotFound
+	}
+
+	s.m[todo.ID] = todo
+	return nil
+}
+
+// Delete a Todo from memory
+func (s *inmemService) Delete(ctx context.Context, id string) error {
+	s.Lock()
+	defer s.Unlock()
+
+	if _, ok := s.m[id]; !ok {
+		return ErrNotFound
+	}
+
+	delete(s.m, id)
+	return nil
+}
+
+```
+
+### Endpoints
+
+`Endpoints` are our first interaction with GoKit. Each interaction with the microservice will be
+through an Endpoint. GoKit provides pluggable transport layers out of the box which know how to
+interact with Endpoints.
+
+Endpoints have a simple definition. They take in a context and a request, and return a response and
+an error.
+
+```go
+type Endpoint func(ctx context.Context, request interface{}) (response interface{}, err error)
+```
+
+Each method of our service needs to be wrapped in an endpoint. Endpoints force us to explicitly
+write what the inputs and outputs of our microservice will look like.
+
+You may notice that `MakeTodoEndpoints` constructor function takes in our `TodoService`. Best
+practices for a GoKit microservice are to use Clean/Hexagonal architectural pattern, where each
+layer can only wraps and only know about the layers within them.
+
+```go
+// endpoint.go
+package todo
+
+import (
+	"context"
+
+	"github.com/go-kit/kit/endpoint"
+)
+
+// Endpoints collects all endpoints which compose the Todo service
+type TodoEndpoints struct {
+	GetAllForUserEndPoint endpoint.Endpoint
+	GetByIDEndpoint       endpoint.Endpoint
+	AddEndpoint           endpoint.Endpoint
+	UpdateEndpoint        endpoint.Endpoint
+	DeleteEndpoint        endpoint.Endpoint
+}
+
+// MakeTodoEndpoints returns an Endpoints struct where each endpoint invokes
+// the corresponding method on the provided Todo
+func MakeTodoEndpoints(s TodoService) TodoEndpoints {
+	return TodoEndpoints{
+		GetAllForUserEndPoint: MakeGetAllForUserEndpoint(s),
+		GetByIDEndpoint:       MakeGetByIDEndpoint(s),
+		AddEndpoint:           MakeAddEndpoint(s),
+		UpdateEndpoint:        MakeUpdateEndpoint(s),
+		DeleteEndpoint:        MakeDeleteEndpoint(s),
+	}
+}
+
+type GetAllForUserRequest struct {
+}
+
+type GetAllForUserResponse struct {
+	Todos []Todo `json:"todos"`
+}
+
+func MakeGetAllForUserEndpoint(s TodoService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		username := ctx.Value("username").(string)
+		todos, err := s.GetAllForUser(ctx, username)
+		return GetAllForUserResponse{todos}, err
+	}
+}
+
+type GetByIDRequest struct {
+	ID string
+}
+
+type GetByIDResponse struct {
+	Todo Todo `json:"todo"`
+}
+
+func MakeGetByIDEndpoint(s TodoService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(GetByIDRequest)
+		todo, err := s.GetByID(ctx, req.ID)
+		return GetByIDResponse{todo}, err
+	}
+}
+
+type AddRequest struct {
+	Todo Todo
+}
+
+type AddResponse struct {
+	Todo Todo `json:"todo"`
+}
+
+func MakeAddEndpoint(s TodoService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(AddRequest)
+		todo, err := s.Add(ctx, req.Todo)
+		return AddResponse{todo}, err
+	}
+}
+
+type UpdateRequest struct {
+	ID   string
+	Todo Todo
+}
+
+type UpdateResponse struct {
+}
+
+func MakeUpdateEndpoint(s TodoService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(UpdateRequest)
+		err := s.Update(ctx, req.ID, req.Todo)
+		return UpdateResponse{}, err
+	}
+}
+
+type DeleteRequest struct {
+	ID string
+}
+
+type DeleteResponse struct {
+}
+
+func MakeDeleteEndpoint(s TodoService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(DeleteRequest)
+		err := s.Delete(ctx, req.ID)
+		return DeleteResponse{}, err
+	}
+}
+
+```
+
+### Transport Layer
+
+The `transport.go` is responsible for converting a transport layer request into an endpoint call.
+For this tutorial we're using `HTTP` as our transport protocol, but we could as easily use something
+like `gRPC`. Go-Kit provides support for `Http`, `gRPC`, `NATs` and `Thrift` out of the box, but
+it's relatively simple to add support for other protocols.
+
+Our `transport.go` is responsible for handling everything to do with http, like creating a route for
+each service method or decoding any parameters. We're using great http routing library [Chi], which
+comes with some really nice middleware.
+
+We create a method to decode each request, i.e. read all the input paramaters; and a single method
+to encode the each response, in which we also add some error handling.
+
+```go
+// transport.go
+package todo
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"net/http"
+
+	"github.com/go-chi/render"
+
+	"github.com/go-chi/chi"
+	chiMiddleware "github.com/go-chi/chi/middleware"
+	httptransport "github.com/go-kit/kit/transport/http"
+)
+
+// ErrMissingParam is thrown when an http request is missing a URL Parameter
+var ErrMissingParam = errors.New("Missing parameter")
+
+// MakeHTTPHandler creates http transport layer for the Todo service
+func MakeHTTPHandler(endpoints TodoEndpoints) http.Handler {
+
+	options := []httptransport.ServerOption{
+		httptransport.ServerErrorEncoder(encodeError),
+	}
+
+	r := chi.NewRouter()
+	r.Use(chiMiddleware.Logger)
+	r.Use(chiMiddleware.StripSlashes)
+	r.Use(chiMiddleware.DefaultCompress)
+
+	todoRouter := chi.NewRouter()
+
+	todoRouter.Get("/", httptransport.NewServer(
+		endpoints.GetAllForUserEndPoint,
+		decodeGetRequest,
+		encodeResponse,
+		options...,
+	).ServeHTTP)
+
+	todoRouter.Get("/{id}", httptransport.NewServer(
+		endpoints.GetByIDEndpoint,
+		decodeGetByIDRequest,
+		encodeResponse,
+		options...,
+	).ServeHTTP)
+
+	todoRouter.Post("/", httptransport.NewServer(
+		endpoints.AddEndpoint,
+		decodeAddRequest,
+		encodeResponse,
+		options...,
+	).ServeHTTP)
+
+	todoRouter.Put("/{id}", httptransport.NewServer(
+		endpoints.UpdateEndpoint,
+		decodeUpdateRequest,
+		encodeResponse,
+		options...,
+	).ServeHTTP)
+
+	todoRouter.Delete("/{id}", httptransport.NewServer(
+		endpoints.DeleteEndpoint,
+		decodeDeleteRequest,
+		encodeResponse,
+		options...,
+	).ServeHTTP)
+
+	r.Mount("/todos", todoRouter)
+
+	return r
+}
+
+func decodeGetRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
+	return GetAllForUserRequest{}, err
+}
+
+func decodeGetByIDRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
+	id := chi.URLParam(r, "id")
+	if id == "" {
+		return nil, ErrMissingParam
+	}
+	return GetByIDRequest{id}, err
+}
+
+func decodeAddRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
+	var todo Todo
+	err = render.Decode(r, &todo)
+	if err != nil {
+		return nil, err
+	}
+	return AddRequest{todo}, err
+}
+
+func decodeUpdateRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
+	id := chi.URLParam(r, "id")
+	if id == "" {
+		return nil, ErrMissingParam
+	}
+	var todo Todo
+	err = render.Decode(r, &todo)
+	if err != nil {
+		return nil, err
+	}
+	return UpdateRequest{id, todo}, err
+}
+
+func decodeDeleteRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
+	id := chi.URLParam(r, "id")
+	if id == "" {
+		return nil, ErrMissingParam
+	}
+	return DeleteRequest{id}, err
+}
+
+func encodeResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
+	if err, ok := response.(error); ok && err != nil {
+		encodeError(ctx, err, w)
+		return nil
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	return json.NewEncoder(w).Encode(response)
+}
+
+func encodeError(_ context.Context, err error, w http.ResponseWriter) {
+	if err == nil {
+		panic("encodeError with nil error")
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(codeFrom(err))
+	json.NewEncoder(w).Encode(map[string]string{
+		"error": err.Error(),
+	})
+}
+
+func codeFrom(err error) int {
+	switch err {
+	case ErrNotFound:
+		return http.StatusNotFound
+	case ErrInconsistentIDs, ErrMissingParam:
+		return http.StatusBadRequest
+	default:
+		return http.StatusInternalServerError
+	}
+}
+
+```
+
+### Main
+
+Finally our `main.go` is responsible for instantiating everything and starting our Http server. You
+can see the hexagonal architecture in the way we instantiate an inner layer and pass them as the
+input into the immediately outer layer.
+
+Below we create our service, our endpoints and start our transport layer.
+
+```go
+// main.go
+package main
+
+import (
+	"net/http"
+
+	"github.com/sinnott74/TodoService/internal/todo"
+)
+
+func main() {
+
+	service := todo.NewInmemTodoService()
+
+	endpoints := todo.MakeTodoEndpoints(service)
+
+	err := http.ListenAndServe(":8000", todo.MakeHTTPHandler(endpoints))
+	if err != nil {
+		panic(err)
+	}
+}
+
+```
+
+Running `go run main.go` will start our Todo service on port 8000.
+
+[golang]: https://golang.org/
+[gokit]: https://gokit.io/
+[stringsvc example]: https://gokit.io/examples/stringsvc.html
+[go installation]: https://golang.org/doc/install
+[chi]: https://github.com/go-chi/chi

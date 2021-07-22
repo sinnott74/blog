@@ -1,0 +1,295 @@
+---
+title: My type(script) of code
+author: Daniel Sinnott
+imageurl: https://i.imgur.com/V2exSsi.png
+id: 18
+tags:
+    - Monthly Challenge
+    - Technical
+    - Typescript
+    - April
+date: Tue, 1st May 2018
+created: 2018-05-01T17:08:17.752Z
+---
+
+## Typescript
+
+The technical goal for this month was to convert server for this blog from javascript to a
+typescript. As this project grows & new features are added, it becomes quite difficult to prevent
+inadvertent side affects. Test suites & good documentation can only bring a project so far, but the
+ability to move quickly is paramount. The less time spent investigating how something works, the
+more time there is to create solutions to real world problems.
+
+### Migration
+
+The migration to typescript was relatively painless and was done incrementally on a file by file
+basis. I started by adding a fairly relaxed (not strict) `tsconfig.json`
+
+```typescript
+{
+    "compilerOptions": {
+        "outDir": "./dist",
+        "allowJs": true,
+        "target": "es2017",
+        "noImplicitAny": true,
+    },
+    "include": [
+        "./src/**/*"
+    ]
+}
+```
+
+A build step then needs to be adde to convert your typescript to runnable javascript. A good
+location for this is `package.json` but your gulp script, webpack config file or any other build
+file could be used.
+
+```javascript
+"scripts": {
+    "prestart": "tsc",
+    "start": "node dist/index.js",
+}
+```
+
+We can now slowly begin converting our files to typescript & slowly making our configuration more &
+more strict to weed out any potential errors.
+
+Microsoft has useful [migration documentation] on their typescript site.
+
+### Features
+
+Because typescript compiles to runnable javascript, it allows developers to use features that
+haven't been implemented in NodeJS yet. A notable feature that I'm making use of in my ORM
+infrastructure is [Decorators].
+
+It allowed me to simply my model definition files & also allow the use of the models to by fully
+typed. A quick comparison of the below files will allow you to see the difference & ease of
+understanding that this feature provides.
+
+#### Old javascript ORM entity file
+
+```javascript
+const ORM = require("sinnott-orm");
+const DataTypes = ORM.DataTypes;
+
+const User = ORM.define(
+    "user",
+    {
+        username: {
+            type: DataTypes.STRING,
+            length: 30,
+            notNull: true,
+            unique: true,
+        },
+        firstname: {
+            type: DataTypes.STRING,
+            length: 30,
+            notNull: true,
+        },
+        lastname: {
+            type: DataTypes.STRING,
+            length: 30,
+            notNull: true,
+        },
+        dob: {
+            type: DataTypes.TIMESTAMP,
+            notNull: true,
+        },
+    },
+    {
+        customAttributes: {
+            fullname: {
+                get: function () {
+                    return `${this.firstname} ${this.lastname}`;
+                },
+            },
+        },
+    },
+);
+
+User.isUsernameAvailable = async function (username) {
+    let count = await User.count({ username });
+    if (count > 0) {
+        return false;
+    }
+    return true;
+};
+
+User.readByUsername = async function (username) {
+    return User.findOne({ username: username });
+};
+
+module.exports = User;
+```
+
+#### New typescript ORM entity file
+
+```typescript
+import { Entity, Column, DerivedColumn, BaseModel, STRING, TIMESTAMP } from "sinnott-orm-typed";
+import InformationalException from "../exception/InformationalException";
+
+@Entity()
+export default class User extends BaseModel {
+    @Column({ type: STRING, notNull: true, length: 30 })
+    username: string;
+
+    @Column({ type: STRING, notNull: true, length: 30 })
+    firstname: string;
+
+    @Column({ type: STRING, notNull: true, length: 30 })
+    lastname: string;
+
+    @Column({ type: TIMESTAMP, notNull: true })
+    dob: Date;
+
+    @DerivedColumn({
+        get: function () {
+            return `${this.firstname} ${this.lastname}`;
+        },
+    })
+    fullname: string;
+
+    async beforeSave() {
+        const isUsernameAvailable = await User.isUsernameAvailable(this.username);
+        if (!isUsernameAvailable) {
+            throw new InformationalException("Duplicate username");
+        }
+    }
+
+    /**
+     * Checks if a username hasn't already been taken
+     * @param username
+     */
+    static async isUsernameAvailable(username: string) {
+        const count = await User.count({ username });
+        return !(count > 0);
+    }
+
+    /**
+     * Reads a User by their username
+     * @param username
+     */
+    static async readByUsername(username: string) {
+        return User.findOne<User>({ username: username });
+    }
+}
+```
+
+### Benchmarks
+
+Strong typing may be a pleasure to work with from a development point of view, but if it impacted
+performance of the application there would be major questions about whether it'd be worth it.
+
+We can see from the benchmark results below that the performance of the javascript & typescript
+versions of the server are virtually identical. This is largely expected. We're using NodeJS 9+ so
+we can get access to the latest & greatest features. The transpilation from javascript to typescript
+only really affects the import statements & the decorators used. If however we were to transpile
+down to a version of javascript which doesn't support advanced language features like async await
+for instance, the performance may take a hit.
+
+The below benchmark was performed using [Apache Benchmark] (ab), which is was incredibly simple to
+use.
+
+#### Javascript implementation
+
+```
+ab -n 100 -c 5 https://*************/api/blogposts/17
+This is ApacheBench, Version 2.3 <$Revision: 1807734 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking ************* (be patient).....done
+
+
+Server Software:
+Server Hostname:        *************
+Server Port:            443
+SSL/TLS Protocol:       TLSv1.2,ECDHE-RSA-AES256-GCM-SHA384,2048,256
+TLS Server Name:        *************
+
+Document Path:          /api/blogposts/17
+Document Length:        8385 bytes
+
+Concurrency Level:      5
+Time taken for tests:   15.004 seconds
+Complete requests:      100
+Failed requests:        0
+Total transferred:      887782 bytes
+HTML transferred:       838500 bytes
+**Requests per second:    6.67 [#/sec] (mean)**
+Time per request:       750.179 [ms] (mean)
+Time per request:       150.036 [ms] (mean, across all concurrent requests)
+Transfer rate:          57.78 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:      419  443  26.4    434     583
+Processing:   271  288  32.0    281     570
+Waiting:      143  156  26.1    149     363
+Total:        694  731  51.3    717    1153
+
+Percentage of the requests served within a certain time (ms)
+  50%    717
+  66%    725
+  75%    733
+  80%    740
+  90%    786
+  95%    802
+  98%    833
+  99%   1153
+ 100%   1153 (longest request)
+```
+
+#### Typescript Implementation
+
+```
+ab  -n 100 -c 5 https://*************/api/blogposts/9
+This is ApacheBench, Version 2.3 <$Revision: 1807734 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking ************* (be patient).....done
+
+
+Server Software:
+Server Hostname:        *************
+Server Port:            443
+SSL/TLS Protocol:       TLSv1.2,ECDHE-RSA-AES256-GCM-SHA384,2048,256
+TLS Server Name:        *************
+
+Document Path:          /api/blogposts/9
+Document Length:        8400 bytes
+
+Concurrency Level:      5
+Time taken for tests:   14.810 seconds
+Complete requests:      100
+Failed requests:        0
+Total transferred:      889256 bytes
+HTML transferred:       840000 bytes
+Requests per second:    6.75 [#/sec] (mean)
+Time per request:       740.517 [ms] (mean)
+Time per request:       148.103 [ms] (mean, across all concurrent requests)
+Transfer rate:          58.64 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:      416  435  19.8    428     548
+Processing:   273  294  52.1    284     758
+Waiting:      144  164  48.5    153     597
+Total:        692  729  57.6    715    1206
+
+Percentage of the requests served within a certain time (ms)
+  50%    715
+  66%    723
+  75%    732
+  80%    735
+  90%    775
+  95%    822
+  98%    840
+  99%   1206
+ 100%   1206 (longest request)
+```
+
+[apache benchmark]: https://httpd.apache.org/docs/2.4/programs/ab.html
+[migration documentation]:
+    https://www.typescriptlang.org/docs/handbook/migrating-from-javascript.html
+[decorators]: /blog/17
