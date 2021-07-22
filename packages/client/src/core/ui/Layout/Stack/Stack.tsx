@@ -1,12 +1,11 @@
 import React, { ReactNode } from "react";
 import { StackContainer, StackItem } from "./styled";
-import { Align, Spacing } from "../util";
+import { Alignable, Spacable } from "../util";
 
-export interface Props {
+export type Props = {
     children?: ReactNode;
-    align?: Align;
-    spacing?: Spacing;
-}
+} & Spacable &
+    Alignable;
 
 export const Stack = React.forwardRef<HTMLDivElement, Props>(
     ({ children, align, spacing }, ref) => {

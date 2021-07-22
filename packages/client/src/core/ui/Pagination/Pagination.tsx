@@ -3,10 +3,11 @@ import { scrollTo } from "../../common/utils/scrollTo";
 import { Button } from "../Button/Button";
 import { ChevronLeft, ChevronRight } from "../Icons";
 import { Inline, Stack, Tiles } from "../Layout";
+import { Responsive } from "../Layout/util";
 import { Text } from "../Typography/Typography";
 
 interface PaginationProps extends PaginationSelectorProps {
-    columns?: number;
+    columns?: Responsive<number>;
     renderItem: (index: number) => JSX.Element;
 }
 

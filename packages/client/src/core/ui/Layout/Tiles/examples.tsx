@@ -19,7 +19,14 @@ const Template: Story<Props> = (args) => (
 );
 
 export const Default = Template.bind({});
-Default.args = {};
+Default.args = {
+    columns: {
+        mobile: 1,
+        tablet: 2,
+        desktop: 3,
+        wide: 4,
+    },
+};
 
 export const XSmall = Template.bind({});
 XSmall.args = { columns: 3, spacing: "xsmall" };

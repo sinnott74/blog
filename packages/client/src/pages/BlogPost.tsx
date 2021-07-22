@@ -23,7 +23,12 @@ export const BlogPost: FC<Props> = ({ Post, title, imageurl, author, tags = [], 
                 <meta name="keywords" content={tags.join()} />
                 <meta name="author" content={author} />
             </Helmet>
-            <Card rounded raised spacing={"large"} width="full">
+            <Card
+                rounded
+                raised
+                spacing={{ mobile: "small", tablet: "large", desktop: "large", wide: "large" }}
+                width="full"
+            >
                 <Stack align="center">
                     <Heading1>{title}</Heading1>
                     <Text secondary>

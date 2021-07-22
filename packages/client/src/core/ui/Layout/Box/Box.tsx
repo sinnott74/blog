@@ -12,6 +12,10 @@ import {
     getSizing,
     getBackground,
     Backgroundable,
+    getResponsive,
+    Align,
+    Size,
+    Spacing,
 } from "../util";
 import CSS from "csstype";
 
@@ -27,21 +31,45 @@ export const Box: FC<Props> = (props) => <BoxInner as={props.component} {...prop
 
 export const BoxInner = styled.div<Props>`
     position: relative;
-    width: ${({ width }) => getSizing(width)};
-    height: ${({ height }) => getSizing(height)};
+    ${(props) => getResponsive<Size>("width", getSizing, props.width)}
+    ${(props) => getResponsive<Size>("height", getSizing, props.height)}
     display: flex;
     flex-direction: column;
     overflow: auto;
-    align-items: ${({ align }) => getAlignment(align)};
-    padding: ${(props) => getSpacing(props.theme.spacing, props.spacing) + "px"};
-    padding-top: ${(props) =>
-        props.spacingTop ? getSpacing(props.theme.spacing, props.spacingTop) + "px" : ""};
-    padding-right: ${(props) =>
-        props.spacingRight ? getSpacing(props.theme.spacing, props.spacingRight) + "px" : ""};
-    padding-bottom: ${(props) =>
-        props.spacingBottom ? getSpacing(props.theme.spacing, props.spacingBottom) + "px" : ""};
-    padding-left: ${(props) =>
-        props.spacingLeft ? getSpacing(props.theme.spacing, props.spacingLeft) + "px" : ""};
+    ${(props) => getResponsive<Align>("align-items", getAlignment, props.align)}
+    ${(props) => getResponsive<Spacing>("padding", getSpacing(props.theme.spacing), props.spacing)}
+    ${(props) =>
+        props.spacingTop
+            ? getResponsive<Spacing>(
+                  "padding-top",
+                  getSpacing(props.theme.spacing),
+                  props.spacingTop,
+              )
+            : ""}
+    ${(props) =>
+        props.spacingRight
+            ? getResponsive<Spacing>(
+                  "padding-right",
+                  getSpacing(props.theme.spacing),
+                  props.spacingRight,
+              )
+            : ""}
+    ${(props) =>
+        props.spacingBottom
+            ? getResponsive<Spacing>(
+                  "padding-bottom",
+                  getSpacing(props.theme.spacing),
+                  props.spacingBottom,
+              )
+            : ""}
+    ${(props) =>
+        props.spacingLeft
+            ? getResponsive<Spacing>(
+                  "padding-left",
+                  getSpacing(props.theme.spacing),
+                  props.spacingLeft,
+              )
+            : ""}
     margin: 0;
     background-color: ${(props) =>
         props.background && getBackground(props.background, props.theme)};

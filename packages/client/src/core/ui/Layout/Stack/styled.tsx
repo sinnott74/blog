@@ -1,13 +1,23 @@
 import styled from "styled-components/macro";
-import { getSpacing, Alignable, Spacable, getAlignment } from "../util";
+import {
+    getSpacing,
+    Alignable,
+    Spacable,
+    getAlignment,
+    getResponsive,
+    Spacing,
+    Align,
+} from "../util";
 
 export const StackContainer = styled.div<Alignable & Spacable>`
     display: flex;
     flex-direction: column;
-    align-items: ${({ align }) => getAlignment(align)};
-    margin-top: ${(props) => getSpacing(props.theme.spacing, props.spacing) * -1 + "px"};
+    ${(props) => getResponsive<Align>("align-items", getAlignment, props.align)}
+    ${(props) =>
+        getResponsive<Spacing>("margin-top", getSpacing(props.theme.spacing), props.spacing)}
 `;
 
 export const StackItem = styled.div<Spacable>`
-    padding-top: ${(props) => `${getSpacing(props.theme.spacing, props.spacing)}px`};
+    ${(props) =>
+        getResponsive<Spacing>("padding-top", getSpacing(props.theme.spacing), props.spacing)}
 `;

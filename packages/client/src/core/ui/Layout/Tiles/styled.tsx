@@ -1,23 +1,29 @@
 import styled from "styled-components/macro";
-import { getSpacing, Spacable } from "../util";
+import { getSpacing, Spacable, getResponsive, Spacing, Responsive } from "../util";
 
 export const TilesContainer = styled.div<Spacable>`
-    margin-left: ${(props) => getSpacing(props.theme.spacing, props.spacing) * -1 + "px"};
     display: flex;
     flex-wrap: wrap;
     align-items: stretch;
+    ${(props) =>
+        getResponsive<Spacing>("margin-top", getSpacing(props.theme.spacing, -1), props.spacing)}
+    ${(props) =>
+        getResponsive<Spacing>("margin-left", getSpacing(props.theme.spacing, -1), props.spacing)}
 `;
 
 interface ItemContainerProps {
-    percentageWidth: number;
+    columns: Responsive<number>;
 }
 export const TilesItemContainer = styled.div<ItemContainerProps>`
-    flex: ${(props) => `0 0 ${props.percentageWidth}%`};
+    ${(props) =>
+        getResponsive<number>("flex", (col: number = 1) => `0 0 ${100 / col}%`, props.columns)}
 `;
 
 export const TilesItem = styled.div<Spacable>`
     height: 100%;
-    padding-left: ${(props) => getSpacing(props.theme.spacing, props.spacing) + "px"};
-    padding-top: ${(props) => getSpacing(props.theme.spacing, props.spacing) + "px"};
     min-width: 0;
+    ${(props) =>
+        getResponsive<Spacing>("padding-left", getSpacing(props.theme.spacing), props.spacing)}
+    ${(props) =>
+        getResponsive<Spacing>("padding-top", getSpacing(props.theme.spacing), props.spacing)}
 `;

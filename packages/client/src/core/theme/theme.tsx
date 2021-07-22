@@ -2,7 +2,7 @@ import React, { FC } from "react";
 import styled, {
     ThemeProvider as StyledComponentThemeProvider,
     createGlobalStyle,
-} from "styled-components/macro";
+} from "styled-components";
 import { SchemeProvider, useColorScheme } from "../services/colorScheme";
 import colors from "material-colors";
 import { merge, CSSVariables } from "./utils";
