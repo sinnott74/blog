@@ -3,6 +3,8 @@ import { NavLink, NavLinkProps, withRouter, RouteComponentProps } from "react-ro
 import styled from "styled-components/macro";
 import { Location } from "history";
 
+type LinkRel = "nofollow" | "noopener" | "noreferrer";
+
 interface LinkProps {
     to: string;
     className?: string;
@@ -13,6 +15,8 @@ interface LinkProps {
     onClick?: () => void;
     location: Location;
     noDecorate?: boolean;
+    target?: "blank";
+    rel?: LinkRel | LinkRel[];
 }
 
 const StyledNavLink = styled(NavLink)<NavLinkProps & { disabled?: boolean; noDecorate?: boolean }>`
@@ -31,6 +35,8 @@ export const InternalLink: FC<LinkProps & RouteComponentProps<any, any, any>> = 
     disabled,
     location,
     noDecorate,
+    target,
+    rel,
 }) => {
     return (
         <StyledNavLink
@@ -41,6 +47,7 @@ export const InternalLink: FC<LinkProps & RouteComponentProps<any, any, any>> = 
             title={title}
             disabled={disabled}
             noDecorate={noDecorate}
+            target={target}
             to={{
                 pathname: to,
                 search: location.search,
@@ -48,6 +55,7 @@ export const InternalLink: FC<LinkProps & RouteComponentProps<any, any, any>> = 
                     from: location.pathname,
                 },
             }}
+            rel={Array.isArray(rel) ? rel.join(" ") : rel}
         >
             {children}
         </StyledNavLink>

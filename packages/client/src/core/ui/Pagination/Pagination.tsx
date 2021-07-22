@@ -1,9 +1,9 @@
 import React, { FC, useRef, useCallback } from "react";
-import { Container, Items, Buttons, Pages, StyledButtonText, FullHeightContainer } from "./styled";
 import { scrollTo } from "../../common/utils/scrollTo";
 import { Button } from "../Button/Button";
 import { ChevronLeft, ChevronRight } from "../Icons";
-import { Inline, Stack, Tiles, Box } from "../Layout";
+import { Inline, Stack, Tiles } from "../Layout";
+import { Text } from "../Typography/Typography";
 
 interface PaginationProps extends PaginationSelectorProps {
     columns?: number;
@@ -70,7 +70,7 @@ const PaginationSelector = ({
         const isCurrent = page === i + 1;
         return (
             <Button icon key={i + 1} primary={isCurrent} onClick={() => onPageChange(i + 1)}>
-                <StyledButtonText>{i + 1}</StyledButtonText>
+                <Text>{i + 1}</Text>
             </Button>
         );
     });

@@ -1,6 +1,9 @@
 import React, { FC } from "react";
-import { Container, Header, HeaderTitle, StyledHeaderLink, Main } from "./styled";
+import { Header, Main } from "./styled";
 import { ROUTES } from "../../../Routes";
+import { Heading4 } from "../Typography/Typography";
+import { Link } from "../Link/Link";
+import { Box } from "../Layout";
 
 interface Props {
     title?: String;
@@ -9,14 +12,16 @@ interface Props {
 }
 
 export const HeaderLayout: FC<Props> = ({ title = "Sinnott", children, left, right }) => (
-    <Container>
+    <Box height="full" width="full" spacing="none">
         <Header>
-            {left}
-            <StyledHeaderLink to={ROUTES.home}>
-                <HeaderTitle>{title}</HeaderTitle>
-            </StyledHeaderLink>
-            {right}
+            <Box align="center" width="full">
+                {left}
+                <Link to={ROUTES.home} noDecorate>
+                    <Heading4>{title}</Heading4>
+                </Link>
+                {right}
+            </Box>
         </Header>
         <Main>{children}</Main>
-    </Container>
+    </Box>
 );
