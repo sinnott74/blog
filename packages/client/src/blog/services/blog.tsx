@@ -13,8 +13,6 @@ export interface Post {
 
 const postImports = import.meta.globEager("../../../posts/*.mdx");
 
-// const postImports: { [key: string]: any } = {};
-
 export const posts: Post[] = Object.keys(postImports).map((key) => {
     const post = postImports[key];
     return {

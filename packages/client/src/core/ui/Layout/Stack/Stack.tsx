@@ -10,10 +10,12 @@ export type Props = {
 export const Stack = React.forwardRef<HTMLDivElement, Props>(
     ({ children, align, spacing }, ref) => {
         const wrappedChildren = React.Children.map(children, (child) => (
-            <StackItem spacing={spacing}>{child}</StackItem>
+            <StackItem align={align} spacing={spacing}>
+                {child}
+            </StackItem>
         ));
         return (
-            <StackContainer ref={ref} align={align} spacing={spacing}>
+            <StackContainer ref={ref} spacing={spacing}>
                 {wrappedChildren}
             </StackContainer>
         );

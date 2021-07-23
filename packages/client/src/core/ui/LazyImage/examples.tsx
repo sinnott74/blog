@@ -9,7 +9,8 @@ export default {
 
 export const Default = () => {
     return (
-        <div style={{ width: "400px", height: "200px" }}>
+        // <div style={{ width: "400px", height: "200px" }}>
+        <>
             <LazyImage
                 src="https://i.imgur.com/ietahcb.png"
                 initialSrc="https://i.imgur.com/ietahcbt.png"
@@ -53,7 +54,8 @@ export const Default = () => {
                 alt="Image with react icon"
                 heightToWidthRatio={1.5}
             />
-        </div>
+        </>
+        // </div>
     );
 };
 
