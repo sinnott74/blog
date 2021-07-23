@@ -1,1 +1,0 @@
-import{R as e}from"./vendor.741606fd.js";import{P as t}from"./Page.9cef0baf.js";import{C as a,c as r,T as l}from"./index.bb336c6d.js";export default()=>e.createElement(t,{title:"404"},e.createElement(a,{raised:!0},e.createElement(r,null,"404"),e.createElement(l,null,"Sorry that page couldn't be found... :/")));
