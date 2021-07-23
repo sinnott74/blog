@@ -10,6 +10,10 @@ export interface Props {
 
 export const Inline = React.forwardRef<HTMLDivElement, Props>(
     ({ children, spacing, align }, ref) => {
+        if (React.Children.count(children) == 0) {
+            return null;
+        }
+
         const wrappedChildren = React.Children.map(children, (child) => (
             <InlineItem spacing={spacing}>{child}</InlineItem>
         ));
