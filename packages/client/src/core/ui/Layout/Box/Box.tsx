@@ -16,6 +16,9 @@ import {
     Align,
     Size,
     Spacing,
+    MaxWidth,
+    MaxWidthable,
+    getMaxWidth,
 } from "../util";
 import CSS from "csstype";
 
@@ -25,7 +28,8 @@ export type Props = { className?: string; style?: CSS.Properties } & Spacable &
     WidthSizable &
     HeightSizable &
     TRBLSpacable &
-    Backgroundable;
+    Backgroundable &
+    MaxWidthable;
 
 export const Box: FC<Props> = (props) => <BoxInner as={props.component} {...props} />;
 
@@ -73,4 +77,6 @@ export const BoxInner = styled.div<Props>`
     margin: 0;
     background-color: ${(props) =>
         props.background && getBackground(props.background, props.theme)};
+    ${(props) =>
+        props.maxWidth ? getResponsive<MaxWidth>("max-width", getMaxWidth, props.maxWidth) : ""}
 `;

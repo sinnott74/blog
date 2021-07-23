@@ -28,6 +28,7 @@ export const BlogPost: FC<Props> = ({ Post, title, imageurl, author, tags = [], 
                 raised
                 spacing={{ mobile: "small", tablet: "large", desktop: "large", wide: "large" }}
                 width="full"
+                maxWidth="medium"
             >
                 <Stack align="center">
                     <Heading1>{title}</Heading1>
