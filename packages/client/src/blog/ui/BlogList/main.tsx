@@ -54,7 +54,7 @@ const BlogListWithState: FC<Props> = ({ useTagsDI = useTags, useBlogPostsDI = us
         : posts;
 
     return (
-        <Box maxWidth="medium" spacing="none">
+        <Box width="full" maxWidth="medium" spacing="none">
             <Stack>
                 <Tags />
                 <BlogList posts={filteredPosts} onTagClick={add} />

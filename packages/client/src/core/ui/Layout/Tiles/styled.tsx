@@ -5,6 +5,7 @@ export const TilesContainer = styled.div<Spacable>`
     display: flex;
     flex-wrap: wrap;
     align-items: stretch;
+    justify-content: center;
     ${(props) =>
         getResponsive<Spacing>("margin-top", getSpacing(props.theme.spacing, -1), props.spacing)}
     ${(props) =>

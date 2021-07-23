@@ -8,6 +8,11 @@ interface Props {
 }
 export const Tags: FC<Props> = ({ useTagsDI = useTags }) => {
     const { tags, remove } = useTagsDI();
+
+    if (tags.length === 0) {
+        return null;
+    }
+
     return (
         <Inline align="center">
             {tags.map((tag) => (

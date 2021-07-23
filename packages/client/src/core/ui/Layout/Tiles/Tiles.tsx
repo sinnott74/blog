@@ -9,11 +9,18 @@ export type Props = {
 
 export const Tiles = React.forwardRef<HTMLDivElement, Props>(
     ({ children, columns = 1, spacing }, ref) => {
-        const wrappedChildren = React.Children.map(children, (child) => (
+        const filteredChildren = React.Children.toArray(children).filter(Boolean);
+
+        if (filteredChildren.length === 0) {
+            return null;
+        }
+
+        const wrappedChildren = filteredChildren.map((child) => (
             <TilesItemContainer columns={columns}>
                 <TilesItem spacing={spacing}>{child}</TilesItem>
             </TilesItemContainer>
         ));
+
         return (
             <TilesContainer ref={ref} spacing={spacing}>
                 {wrappedChildren}
