@@ -1,5 +1,6 @@
 import React, { FC } from "react";
 import Helmet from "react-helmet";
+import { useScrollTop } from "../../common/utils/scrollTo";
 import { Box } from "../Layout";
 
 export interface Props {
@@ -7,6 +8,8 @@ export interface Props {
 }
 
 export const Page: FC<Props> = ({ title, children }) => {
+    useScrollTop();
+
     return (
         <Box
             align="center"
