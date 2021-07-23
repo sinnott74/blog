@@ -169,3 +169,26 @@ export interface Backgroundable {
 export const getBackground = (background: Background, theme: Theme) => {
     return theme.palette.background[background];
 };
+
+/******************************
+ * Background
+ ******************************/
+export type MaxWidth = "none" | "xsmall" | "small" | "medium" | "large";
+export type ResponsiveMaxWidth = Responsive<MaxWidth>;
+
+export type MaxWidthable = {
+    maxWidth?: ResponsiveMaxWidth;
+};
+
+const maxWidthMapping = {
+    none: undefined,
+    xsmall: 640,
+    small: 768,
+    medium: 1024,
+    large: 1920,
+};
+
+export const getMaxWidth = (maxWidth: MaxWidth = "none") => {
+    const value = maxWidthMapping[maxWidth];
+    return value ? value + "px" : "initial";
+};

@@ -5,6 +5,7 @@ import { BlogCard, Props as BlogCardProps } from "../BlogCard/BlogCard";
 import { Pagination } from "../../../core/ui/Pagination/Pagination";
 import { Tags } from "../Tags";
 import { Container } from "./styled";
+import { Box, Stack } from "../../../core/ui/Layout";
 
 interface BlogListProps {
     posts: BlogCardProps[];
@@ -53,10 +54,12 @@ const BlogListWithState: FC<Props> = ({ useTagsDI = useTags, useBlogPostsDI = us
         : posts;
 
     return (
-        <Container>
-            <Tags />
-            <BlogList posts={filteredPosts} onTagClick={add} />
-        </Container>
+        <Box maxWidth="medium" spacing="none">
+            <Stack>
+                <Tags />
+                <BlogList posts={filteredPosts} onTagClick={add} />
+            </Stack>
+        </Box>
     );
 };
 
