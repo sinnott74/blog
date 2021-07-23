@@ -40,9 +40,9 @@ export const BlogPost: FC<Props> = ({ Post, title, imageurl, author, tags = [], 
                         ))}
                     </Inline>
                     <ShareLinks url={window.location.href} title={title} />
+                    {imageurl && <LazyImage src={imageurl} title={title} />}
+                    <Post />
                 </Stack>
-                {imageurl && <LazyImage src={imageurl} title={title} />}
-                <Post />
             </Card>
         </Page>
     );
