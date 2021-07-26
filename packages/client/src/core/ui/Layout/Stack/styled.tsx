@@ -22,4 +22,7 @@ export const StackItem = styled.div<Alignable & Spacable>`
     display: flex;
     flex-direction: column;
     ${(props) => getResponsive<Align>("align-items", getAlignment, props.align)}
+    &:empty {
+        display: none;
+    }
 `;
