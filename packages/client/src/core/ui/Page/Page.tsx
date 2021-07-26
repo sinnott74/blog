@@ -15,6 +15,7 @@ export const Page: FC<Props> = ({ title, children }) => {
             align="center"
             width="full"
             spacing={{ mobile: "xsmall", tablet: "medium", desktop: "medium", wide: "medium" }}
+            spacingTop={{ mobile: "small", tablet: "medium", desktop: "medium", wide: "medium" }}
         >
             <Helmet>
                 <title>{`${title} | DanielSinnott.com`}</title>
