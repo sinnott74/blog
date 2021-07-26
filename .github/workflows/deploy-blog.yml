@@ -13,12 +13,9 @@ jobs:
       - name: Install and Build 🔧
         run: |
           yarn install
-          yarn workspace client build
-
+          VITE_BASE_URL=/blog/ yarn workspace client build
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
-          branch: master # The branch the action should deploy to.
+          branch: gh-pages # The branch the action should deploy to.
           folder: packages/client/build # The folder the action should deploy.
-          repository-name: sinnott74/sinnott74.github.io
-          
