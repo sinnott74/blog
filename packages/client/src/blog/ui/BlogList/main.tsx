@@ -42,7 +42,7 @@ export type Props = {
 };
 
 const BlogListWithState: FC<Props> = ({ useTagsDI = useTags, useBlogPostsDI = useBlogPosts }) => {
-    const { tags, add } = useTagsDI();
+    const { tags, add, remove } = useTagsDI();
     const posts = useBlogPostsDI();
 
     const filteredPosts = tags.length
@@ -61,7 +61,7 @@ const BlogListWithState: FC<Props> = ({ useTagsDI = useTags, useBlogPostsDI = us
     return (
         <Box width="full" maxWidth="medium" spacing="none">
             <Stack>
-                <Tags />
+                <Tags tags={tags} onTagClick={remove} closeable align="center" />
                 <BlogList posts={filteredPosts} onTagClick={add} />
             </Stack>
         </Box>

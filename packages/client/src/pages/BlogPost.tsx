@@ -1,15 +1,15 @@
 import React, { FC, Suspense } from "react";
 import { LazyImage } from "../core/ui/LazyImage/LazyImage";
-import { Card, Inline, Stack } from "../core/ui/Layout";
+import { Card, Stack } from "../core/ui/Layout";
 import { Page } from "../core/ui/Page/Page";
 import { Heading1, Text } from "../core/ui/Typography/styled";
-import { Chip } from "../core/ui/Chip/Chip";
 import { ShareLinks } from "../core/ui/ShareLinks/ShareLinks";
 import { Helmet } from "react-helmet";
 import { useHistory } from "react-router";
 import { ROUTES } from "../Routes";
 import { withMdx } from "../core/services/mdx";
 import { Spinner } from "../core/ui/Spinner/Spinner";
+import { Tags } from "../blog/ui/Tags";
 
 interface Props {
     Post: React.LazyExoticComponent<() => JSX.Element>;
@@ -40,13 +40,11 @@ export const BlogPost: FC<Props> = ({ Post, title, imageurl, author, tags = [], 
                     <Text secondary>
                         {date} By {author}
                     </Text>
-                    <Inline>
-                        {tags.map((tag) => (
-                            <Chip key={tag} onClick={() => push(`${ROUTES.home}?tags=${tag}`)}>
-                                {tag}
-                            </Chip>
-                        ))}
-                    </Inline>
+                    <Tags
+                        tags={tags}
+                        align="center"
+                        onTagClick={(tag) => push(`${ROUTES.home}?tags=${tag}`)}
+                    />
                     <ShareLinks url={window.location.href} title={title} />
                     {imageurl && <LazyImage src={imageurl} title={title} />}
                     <Suspense fallback={<Spinner />}>

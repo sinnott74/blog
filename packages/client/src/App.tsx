@@ -12,7 +12,7 @@ const App: React.FC = () => {
     return (
         <Router basename={import.meta.env.BASE_URL || ""}>
             <HeaderLayout>
-                <Routes></Routes>
+                <Routes />
             </HeaderLayout>
         </Router>
     );

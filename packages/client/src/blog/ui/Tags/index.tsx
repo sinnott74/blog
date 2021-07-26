@@ -1,22 +1,25 @@
 import React, { FC } from "react";
-import { useTags } from "../../services/tags";
 import { Chip } from "../../../core/ui/Chip/Chip";
 import { Inline } from "../../../core/ui/Layout";
+import { Align } from "src/core/ui/Layout/util";
 
 interface Props {
-    useTagsDI?: typeof useTags;
+    align?: Align;
+    tags: string[];
+    onTagClick?: (tag: string) => void;
+    closeable?: boolean;
 }
-export const Tags: FC<Props> = ({ useTagsDI = useTags }) => {
-    const { tags, remove } = useTagsDI();
-
-    if (tags.length === 0) {
-        return null;
-    }
-
+export const Tags: FC<Props> = ({ tags, onTagClick, align, closeable }) => {
     return (
-        <Inline align="center">
-            {tags.map((tag) => (
-                <Chip key={tag} closeable onClick={() => remove(tag)}>
+        <Inline spacing="xxsmall" align={align}>
+            {tags.filter(Boolean).map((tag) => (
+                <Chip
+                    key={tag}
+                    onClick={() => {
+                        onTagClick && onTagClick(tag);
+                    }}
+                    closeable={closeable}
+                >
                     {tag}
                 </Chip>
             ))}

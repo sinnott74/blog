@@ -1,9 +1,9 @@
 import React, { FC } from "react";
-import { Card, Stack, Inline, Box } from "../../../core/ui/Layout";
-import { Chip } from "../../../core/ui/Chip/Chip";
+import { Card, Stack, Box } from "../../../core/ui/Layout";
 import { LazyImage } from "../../../core/ui/LazyImage/LazyImage";
 import { Heading3, Text } from "../../../core/ui/Typography/styled";
 import { Link } from "../../../core/ui/Link/Link";
+import { Tags } from "../Tags";
 
 export interface Props {
     id: string;
@@ -15,34 +15,21 @@ export interface Props {
     className?: string;
 }
 
-export const BlogCard: FC<Props> = ({ id, title, date, imageurl, tags = [], onTagClick }) => {
-    const Tags = tags?.map((tag) => (
-        <Chip
-            key={tag}
-            onClick={() => {
-                onTagClick && onTagClick(tag);
-            }}
-        >
-            {tag}
-        </Chip>
-    ));
-
-    return (
-        <Card rounded raised spacing="none" height="full">
-            <Link to={`/blog/${id}`} title={title} noDecorate>
-                <LazyImage src={imageurl || ""} title={title} />
-            </Link>
-            <Box>
-                <Stack>
-                    <Stack spacing="none">
-                        <Link to={`/blog/${id}`} title={title} noDecorate>
-                            <Heading3>{title}</Heading3>
-                        </Link>
-                        <Text secondary>{date}</Text>
-                    </Stack>
-                    <Inline spacing="xsmall">{Tags}</Inline>
+export const BlogCard: FC<Props> = ({ id, title, date, imageurl, tags = [], onTagClick }) => (
+    <Card rounded raised spacing="none" height="full">
+        <Link to={`/blog/${id}`} title={title} noDecorate>
+            <LazyImage src={imageurl || ""} title={title} />
+        </Link>
+        <Box>
+            <Stack>
+                <Stack spacing="none">
+                    <Link to={`/blog/${id}`} title={title} noDecorate>
+                        <Heading3>{title}</Heading3>
+                    </Link>
+                    <Text secondary>{date}</Text>
                 </Stack>
-            </Box>
-        </Card>
-    );
-};
+                <Tags tags={tags} onTagClick={onTagClick} />
+            </Stack>
+        </Box>
+    </Card>
+);
