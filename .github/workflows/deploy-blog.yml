@@ -20,5 +20,5 @@ jobs:
         with:
           branch: master # The branch the action should deploy to.
           folder: packages/client/build # The folder the action should deploy.
-          repository-name: sinnott74.github.io
+          repository-name: sinnott74/sinnott74.github.io
           
