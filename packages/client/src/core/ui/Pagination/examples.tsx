@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Pagination } from "./Pagination";
-import { Text } from "../Typography/Typography";
 
 export default {
     component: Pagination,

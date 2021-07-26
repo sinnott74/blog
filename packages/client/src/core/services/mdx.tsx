@@ -43,8 +43,8 @@ const components = {
     blockquote: Quote,
 };
 
-export const withMdx = (WrappedComponent: FC) => () => (
+export const withMdx = <T extends {}>(WrappedComponent: FC<T>) => (props: T) => (
     <MDXProvider components={components}>
-        <WrappedComponent />
+        <WrappedComponent {...props} />
     </MDXProvider>
 );

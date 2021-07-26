@@ -14,6 +14,7 @@ interface LinkProps {
     disabled?: boolean;
     onClick?: () => void;
     location: Location;
+    search?: string;
     noDecorate?: boolean;
     target?: "blank";
     rel?: LinkRel | LinkRel[];
@@ -34,6 +35,7 @@ export const InternalLink: FC<LinkProps & RouteComponentProps<any, any, any>> = 
     children,
     disabled,
     location,
+    search,
     noDecorate,
     target,
     rel,
@@ -50,7 +52,7 @@ export const InternalLink: FC<LinkProps & RouteComponentProps<any, any, any>> = 
             target={target}
             to={{
                 pathname: to,
-                search: location.search,
+                search: search,
                 state: {
                     from: location.pathname,
                 },

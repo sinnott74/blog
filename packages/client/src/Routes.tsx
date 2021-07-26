@@ -3,7 +3,8 @@ import { Switch, Route, RouteComponentProps, withRouter } from "react-router-dom
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { Spinner } from "./core/ui/Spinner/Spinner";
 import styled from "styled-components/macro";
-import { posts } from "./blog/services/blog";
+import { data } from "@routes";
+import { PostMetadata } from "./blog/services/blog";
 
 export const ROUTES = {
     home: "/",
@@ -16,13 +17,11 @@ const LazyAbout = lazy(() => import("./pages/About"));
 const LazyBlogPost = lazy(() => import("./pages/BlogPost"));
 const Lazy404 = lazy(() => import("./pages/404"));
 
-const postRoutes = posts.map((post) => {
-    return {
-        path: ROUTES.blogPost(post.id),
-        exact: true,
-        component: () => <LazyBlogPost {...post} />,
-    };
-});
+const postRoutes = data<PostMetadata>().map((post) => ({
+    path: post.path,
+    exact: post.exact,
+    render: () => <LazyBlogPost Post={post.component} {...post.data} />,
+}));
 
 // Array of Routes,
 export const routes = [
@@ -60,6 +59,9 @@ export const Routes: FC<RouteComponentProps<any, any, any>> = ({ location }) => 
                             key={index}
                             path={route.path}
                             exact={route.exact}
+                            //@ts-ignore
+                            render={route.render}
+                            //@ts-ignore
                             component={route.component}
                         />
                     ))}

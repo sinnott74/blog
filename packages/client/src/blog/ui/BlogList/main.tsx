@@ -1,11 +1,16 @@
 import React, { FC, useState } from "react";
-import { useBlogPosts } from "../../services/blog";
 import { useTags } from "../../services/tags";
 import { BlogCard, Props as BlogCardProps } from "../BlogCard/BlogCard";
 import { Pagination } from "../../../core/ui/Pagination/Pagination";
 import { Tags } from "../Tags";
-import { Container } from "./styled";
 import { Box, Stack } from "../../../core/ui/Layout";
+import { data } from "@metadata";
+import { PostMetadata } from "src/blog/services/blog";
+
+const useBlogPosts = () =>
+    data<PostMetadata>().sort(
+        (post1, post2) => new Date(post2.created).getTime() - new Date(post1.created).getTime(),
+    );
 
 interface BlogListProps {
     posts: BlogCardProps[];
@@ -37,8 +42,8 @@ export type Props = {
 };
 
 const BlogListWithState: FC<Props> = ({ useTagsDI = useTags, useBlogPostsDI = useBlogPosts }) => {
-    const { tags, add } = useTags();
-    const posts = useBlogPosts();
+    const { tags, add } = useTagsDI();
+    const posts = useBlogPostsDI();
 
     const filteredPosts = tags.length
         ? posts.filter((post) => {
