@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, Suspense } from "react";
 import { LazyImage } from "../core/ui/LazyImage/LazyImage";
 import { Card, Inline, Stack } from "../core/ui/Layout";
 import { Page } from "../core/ui/Page/Page";
@@ -9,6 +9,7 @@ import { Helmet } from "react-helmet";
 import { useHistory } from "react-router";
 import { ROUTES } from "../Routes";
 import { withMdx } from "../core/services/mdx";
+import { Spinner } from "../core/ui/Spinner/Spinner";
 
 interface Props {
     Post: React.LazyExoticComponent<() => JSX.Element>;
@@ -48,7 +49,9 @@ export const BlogPost: FC<Props> = ({ Post, title, imageurl, author, tags = [], 
                     </Inline>
                     <ShareLinks url={window.location.href} title={title} />
                     {imageurl && <LazyImage src={imageurl} title={title} />}
-                    <Post />
+                    <Suspense fallback={<Spinner />}>
+                        <Post />
+                    </Suspense>
                 </Stack>
             </Card>
         </Page>

@@ -1,7 +1,7 @@
 import React, { lazy, Suspense, FC } from "react";
 import { Switch, Route, RouteComponentProps, withRouter } from "react-router-dom";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
-import { Spinner } from "./core/ui/Spinner/Spinner";
+import { AbsolutelyCenteredSpinner as Spinner } from "./core/ui/Spinner/Spinner";
 import styled from "styled-components/macro";
 import { data } from "@routes";
 import { PostMetadata } from "./blog/services/blog";
