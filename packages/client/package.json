@@ -57,6 +57,7 @@
         "remark-frontmatter": "^3.0.0",
         "remark-gfm": "^1.0.0",
         "remark-mdx-frontmatter": "^1.0.1",
+        "remark-unwrap-images": "^2.1.0",
         "rollup-plugin-analyzer": "^4.0.0",
         "storybook-builder-vite": "^0.0.12",
         "storybook-react-router": "^1.0.8",

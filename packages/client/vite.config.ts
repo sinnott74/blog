@@ -6,6 +6,7 @@ import mdx from "vite-plugin-mdx";
 import gfm from "remark-gfm";
 import frontmatter from "remark-frontmatter";
 import { remarkMdxFrontmatter } from "remark-mdx-frontmatter";
+import unwrapImages from "remark-unwrap-images";
 
 import { metadata, routes } from "./src/plugins";
 
@@ -16,7 +17,7 @@ import analyze from "rollup-plugin-analyzer";
 // `options` are passed to `@mdx-js/mdx`
 const options = {
     // See https://mdxjs.com/advanced/plugins
-    remarkPlugins: [gfm, frontmatter, remarkMdxFrontmatter],
+    remarkPlugins: [gfm, frontmatter, remarkMdxFrontmatter, unwrapImages],
     // E.g. `remark-frontmatter`
     rehypePlugins: [],
 };
