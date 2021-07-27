@@ -16,8 +16,10 @@ export const Inline = React.forwardRef<HTMLDivElement, Props>(
             return null;
         }
 
-        const wrappedChildren = filteredChildren.map((child) => (
-            <InlineItem spacing={spacing}>{child}</InlineItem>
+        const wrappedChildren = filteredChildren.map((child, i) => (
+            <InlineItem key={i} spacing={spacing}>
+                {child}
+            </InlineItem>
         ));
 
         return (

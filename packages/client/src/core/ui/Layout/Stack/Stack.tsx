@@ -15,8 +15,8 @@ export const Stack = React.forwardRef<HTMLDivElement, Props>(
             return null;
         }
 
-        const wrappedChildren = filteredChildren.map((child) => (
-            <StackItem align={align} spacing={spacing}>
+        const wrappedChildren = filteredChildren.map((child, i) => (
+            <StackItem key={i} align={align} spacing={spacing}>
                 {child}
             </StackItem>
         ));

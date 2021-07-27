@@ -15,8 +15,8 @@ export const Tiles = React.forwardRef<HTMLDivElement, Props>(
             return null;
         }
 
-        const wrappedChildren = filteredChildren.map((child) => (
-            <TilesItemContainer columns={columns}>
+        const wrappedChildren = filteredChildren.map((child, i) => (
+            <TilesItemContainer key={i} columns={columns}>
                 <TilesItem spacing={spacing}>{child}</TilesItem>
             </TilesItemContainer>
         ));
