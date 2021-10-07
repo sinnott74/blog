@@ -13,6 +13,7 @@ import { Line } from "../ui/Line/Line";
 import { MDXProvider } from "@mdx-js/react";
 import { LazyImage } from "../ui/LazyImage/LazyImage";
 import { Code } from "../ui/Code/Code";
+import { InlineCode } from "../ui/Code/InlineCode";
 import { Stack } from "../ui/Layout";
 import { Row, DataCell, HeaderCell } from "../ui/Table";
 import { ListItem, OrderedList, UnorderedList } from "../ui/List/List";
@@ -31,6 +32,7 @@ const components = {
     img: LazyImage,
     p: Text,
     hr: Line,
+    inlineCode: InlineCode,
     code: Code,
     pre: Children,
     wrapper: Wrapper,

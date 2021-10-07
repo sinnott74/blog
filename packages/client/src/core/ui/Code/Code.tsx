@@ -4,6 +4,7 @@ import light from "prism-react-renderer/themes/vsLight";
 import dark from "prism-react-renderer/themes/vsDark";
 import { useColorScheme } from "../../services/colorScheme";
 import { Card } from "../Layout";
+import { Code as CodeText } from "../Typography/Typography";
 
 interface Props {
     className?: string;
@@ -29,13 +30,15 @@ export const Code: FC<Props> = ({ children, className }) => {
                     className={className}
                     // style={style}
                 >
-                    {tokens.map((line, i) => (
-                        <div key={i} {...getLineProps({ line, key: i })}>
-                            {line.map((token, key) => (
-                                <span key={key} {...getTokenProps({ token, key })} />
-                            ))}
-                        </div>
-                    ))}
+                    <CodeText>
+                        {tokens.map((line, i) => (
+                            <div key={i} {...getLineProps({ line, key: i })}>
+                                {line.map((token, key) => (
+                                    <span key={key} {...getTokenProps({ token, key })} />
+                                ))}
+                            </div>
+                        ))}
+                    </CodeText>
                 </Card>
             )}
         </Highlight>

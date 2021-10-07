@@ -192,3 +192,17 @@ export const getMaxWidth = (maxWidth: MaxWidth = "none") => {
     const value = maxWidthMapping[maxWidth];
     return value ? value + "px" : "initial";
 };
+
+/******************************
+ * Display
+ ******************************/
+export type Display = "none" | "flex" | "inline";
+export type ResponsiveDisplay = Responsive<Display>;
+
+export type Displayable = {
+    display?: ResponsiveDisplay;
+};
+
+export const getDisplay = (display: Display = "flex") => {
+    return display;
+};

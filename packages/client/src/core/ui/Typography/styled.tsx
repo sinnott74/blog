@@ -96,3 +96,20 @@ export const Text = styled.p<TextProps>`
     font-size: ${(props) => `${props.theme.typography.fontSize}px`};
     /* font-size: ${(props) => `${props.theme.typography.fontSize}px`}; */
 `;
+
+export const Code = styled.code<TextProps>`
+    font-family: Menlo, Monaco, Consolas, Courier New, monospace;
+    color: ${(props) => {
+        const weight = props.secondary ? "lighter" : "main";
+        return props.alternative
+            ? props.theme.palette.background[weight]
+            : props.theme.palette.text[weight];
+    }};
+    font-weight: 400;
+    margin: 0;
+    line-height: ${(props) => `${props.theme.typography.fontSize * 1.5}px`};
+    /* margin-bottom: 0.35em; */
+    font-size: ${(props) => `${props.theme.typography.fontSize * 0.875}px`};
+    /* font-size: ${(props) => `${props.theme.typography.fontSize}px`}; */
+    background-color: ${(props) => props.theme.palette.background.darker};
+`;
