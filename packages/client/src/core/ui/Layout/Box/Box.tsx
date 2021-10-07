@@ -19,6 +19,9 @@ import {
     MaxWidth,
     MaxWidthable,
     getMaxWidth,
+    Display,
+    getDisplay,
+    Displayable,
 } from "../util";
 import CSS from "csstype";
 
@@ -29,7 +32,8 @@ export type Props = { className?: string; style?: CSS.Properties } & Spacable &
     HeightSizable &
     TRBLSpacable &
     Backgroundable &
-    MaxWidthable;
+    MaxWidthable &
+    Displayable;
 
 export const Box: FC<Props> = (props) => <BoxInner as={props.component} {...props} />;
 
@@ -37,7 +41,7 @@ export const BoxInner = styled.div<Props>`
     position: relative;
     ${(props) => getResponsive<Size>("width", getSizing, props.width)}
     ${(props) => getResponsive<Size>("height", getSizing, props.height)}
-    display: flex;
+    ${(props) => getResponsive<Display>("display", getDisplay, props.display)}
     flex-direction: column;
     overflow: auto;
     ${(props) => getResponsive<Align>("align-items", getAlignment, props.align)}
