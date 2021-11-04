@@ -8,11 +8,17 @@ import frontmatter from "remark-frontmatter";
 import { remarkMdxFrontmatter } from "remark-mdx-frontmatter";
 import unwrapImages from "remark-unwrap-images";
 
-import { metadata, routes } from "./src/plugins";
+import { metadata, routes, search } from "./src/plugins";
 
 import macrosPlugin from "vite-plugin-babel-macros";
 
 import analyze from "rollup-plugin-analyzer";
+
+// @ts-ignore
+const mdxDefault: typeof mdx = mdx.default;
+
+// @ts-ignore
+const macrosPluginDefault: typeof macrosPlugin = macrosPlugin.default;
 
 // `options` are passed to `@mdx-js/mdx`
 const options = {
@@ -35,5 +41,13 @@ export default defineConfig({
         },
     },
     base: process.env.VITE_BASE_URL || "/",
-    plugins: [routes(), metadata(), ...testPlugins, svgr(), mdx(options), macrosPlugin()],
+    plugins: [
+        search(),
+        metadata(),
+        routes(),
+        ...testPlugins,
+        svgr(),
+        mdxDefault(options),
+        macrosPluginDefault(),
+    ],
 });

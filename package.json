@@ -11,5 +11,8 @@
         "nohoist": [
             "**/*"
         ]
+    },
+    "dependencies": {
+        "typescript": "typescript@beta"
     }
 }

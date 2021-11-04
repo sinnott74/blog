@@ -24,7 +24,7 @@ module.exports = {
     viteFinal: async (config, { configType }) => {
         // mdx is already included in the plugins (at index 2). Removing it so we can configure it ourselves
         // https://github.com/eirslett/storybook-builder-vite/blob/main/packages/storybook-builder-vite/vite-config.js
-        config.plugins.splice(2, 1, svgr(), mdx(options), macrosPlugin());
+        config.plugins.splice(2, 1, routes(), metadata(), svgr(), mdx(options), macrosPlugin());
         return config;
     },
 };

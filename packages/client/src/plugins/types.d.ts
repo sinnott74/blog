@@ -10,3 +10,7 @@ declare module "@routes" {
         data: T;
     }[];
 }
+
+declare module "@search" {
+    export const test: (words: string) => string[];
+}
