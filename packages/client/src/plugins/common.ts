@@ -7,7 +7,7 @@ type Metadata = {
 type Filename = string;
 
 export const getPostsMetaData = () => {
-    const posts = getPosts();
+    const posts = getPostFilenames();
     return posts.reduce((acc, post) => {
         const metadata = matter.read(`./posts/${post}`).data;
         acc[post] = metadata;
@@ -15,7 +15,7 @@ export const getPostsMetaData = () => {
     }, {} as Record<Filename, Metadata>);
 };
 
-const getPosts = () => {
+export const getPostFilenames = () => {
     const files = fs.readdirSync("./posts");
     return files;
 };
