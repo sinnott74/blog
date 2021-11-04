@@ -1,5 +1,5 @@
 import React, { FC, Suspense } from "react";
-import { LazyImage } from "../core/ui/LazyImage/LazyImage";
+import { LazyImgur } from "../core/ui/LazyImage/LazyImgur";
 import { Card, Stack } from "../core/ui/Layout";
 import { Page } from "../core/ui/Page/Page";
 import { Heading1, Text } from "../core/ui/Typography/styled";
@@ -46,7 +46,7 @@ export const BlogPost: FC<Props> = ({ Post, title, imageurl, author, tags = [], 
                         onTagClick={(tag) => push(`${ROUTES.home}?tags=${tag}`)}
                     />
                     <ShareLinks url={window.location.href} title={title} />
-                    {imageurl && <LazyImage src={imageurl} title={title} />}
+                    {imageurl && <LazyImgur src={imageurl} title={title} />}
                     <Suspense fallback={<Spinner />}>
                         <Post />
                     </Suspense>

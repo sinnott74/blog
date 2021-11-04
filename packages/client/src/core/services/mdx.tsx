@@ -18,6 +18,7 @@ import { Stack } from "../ui/Layout";
 import { Row, DataCell, HeaderCell } from "../ui/Table";
 import { ListItem, OrderedList, UnorderedList } from "../ui/List/List";
 import { Quote } from "../ui/Quote/Quote";
+import { LazyImgur } from "../ui/LazyImage/LazyImgur";
 
 const Children: FC = ({ children }) => <>{children}</>;
 const Wrapper: FC = (props) => <Stack spacing="medium" {...props} />;
@@ -29,7 +30,7 @@ const components = {
     h4: Heading4,
     h5: Heading5,
     h6: Heading6,
-    img: LazyImage,
+    img: LazyImgur,
     p: Text,
     hr: Line,
     inlineCode: InlineCode,

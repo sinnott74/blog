@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 import { Card, Stack, Box } from "../../../core/ui/Layout";
-import { LazyImage } from "../../../core/ui/LazyImage/LazyImage";
+import { LazyImgur } from "../../../core/ui/LazyImage/LazyImgur";
 import { Heading3, Text } from "../../../core/ui/Typography/styled";
 import { Link } from "../../../core/ui/Link/Link";
 import { Tags } from "../Tags";
@@ -18,7 +18,7 @@ export interface Props {
 export const BlogCard: FC<Props> = ({ id, title, date, imageurl, tags = [], onTagClick }) => (
     <Card rounded raised spacing="none" height="full">
         <Link to={`/blog/${id}`} title={title} noDecorate>
-            <LazyImage src={imageurl || ""} title={title} />
+            <LazyImgur src={imageurl || ""} title={title} />
         </Link>
         <Box>
             <Stack>

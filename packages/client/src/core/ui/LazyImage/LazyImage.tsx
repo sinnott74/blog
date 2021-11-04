@@ -26,7 +26,7 @@ export const LazyImage: FC<LazyImageProps> = ({
         triggerOnce: true,
     });
     const [placeholder, setPlaceholder] = useState(true);
-    const [initial, setInitial] = useState(false);
+    const [initial, setInitial] = useState(!!initialSrc);
     const [lazy, setLazy] = useState(false);
 
     const handleInitialLoaded = () => {
@@ -51,7 +51,7 @@ export const LazyImage: FC<LazyImageProps> = ({
     return (
         <Container ratio={ratio} className={className} ref={ref} onClick={onClick}>
             {placeholder && <Placeholder />}
-            {initialSrc && (
+            {initial && (
                 <Initial
                     src={initialSrc}
                     alt={alt}

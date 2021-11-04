@@ -62,13 +62,41 @@ export const Default = () => {
 export const Imgur = () => {
     return (
         <div style={{ width: "400px", height: "200px" }}>
-            <LazyImgur fileName="ietahcb.png" title="Lazy Image" alt="Image with react icon" />
-            <LazyImgur fileName="ietahcb.png" title="Lazy Image" alt="Image with react icon" />
-            <LazyImgur fileName="ietahcb.png" title="Lazy Image" alt="Image with react icon" />
-            <LazyImgur fileName="ietahcb.png" title="Lazy Image" alt="Image with react icon" />
-            <LazyImgur fileName="4Ep7VSO.png" title="Lazy Image" alt="Image with react icon" />
-            <LazyImgur fileName="axoBYe2.png" title="Lazy Image" alt="Image with react icon" />
-            <LazyImgur fileName="ZVaDnJx.png" title="Lazy Image" alt="Image with react icon" />
+            <LazyImgur
+                src="https://i.imgur.com/ietahcb.png"
+                title="Lazy Image"
+                alt="Image with react icon"
+            />
+            <LazyImgur
+                src="https://i.imgur.com/ietahcb.png"
+                title="Lazy Image"
+                alt="Image with react icon"
+            />
+            <LazyImgur
+                src="https://i.imgur.com/ietahcb.png"
+                title="Lazy Image"
+                alt="Image with react icon"
+            />
+            <LazyImgur
+                src="https://i.imgur.com/ietahcb.png"
+                title="Lazy Image"
+                alt="Image with react icon"
+            />
+            <LazyImgur
+                src="https://i.imgur.com/4Ep7VSO.png"
+                title="Lazy Image"
+                alt="Image with react icon"
+            />
+            <LazyImgur
+                src="https://i.imgur.com/axoBYe2.png"
+                title="Lazy Image"
+                alt="Image with react icon"
+            />
+            <LazyImgur
+                src="https://i.imgur.com/ZVaDnJx.png"
+                title="Lazy Image"
+                alt="Image with react icon"
+            />
         </div>
     );
 };
