@@ -11,7 +11,6 @@ import {
 import { Line } from "../ui/Line/Line";
 
 import { MDXProvider } from "@mdx-js/react";
-import { LazyImage } from "../ui/LazyImage/LazyImage";
 import { Code } from "../ui/Code/Code";
 import { InlineCode } from "../ui/Code/InlineCode";
 import { Stack } from "../ui/Layout";
@@ -23,14 +22,14 @@ import { LazyImgur } from "../ui/LazyImage/LazyImgur";
 const Children: FC = ({ children }) => <>{children}</>;
 const Wrapper: FC = (props) => <Stack spacing="medium" {...props} />;
 
-const components = {
+const components: any = {
     h1: Heading1,
     h2: Heading2,
     h3: Heading3,
     h4: Heading4,
     h5: Heading5,
     h6: Heading6,
-    img: LazyImgur,
+    img: (props: any) => <LazyImgur {...props} caption />,
     p: Text,
     hr: Line,
     inlineCode: InlineCode,
