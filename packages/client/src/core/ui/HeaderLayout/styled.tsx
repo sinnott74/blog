@@ -22,6 +22,18 @@ export const Header = styled.div`
     padding: ${(props) => `0 ${props.theme.spacing}px`};
 `;
 
+export const RightSectionContainer = styled.div`
+    display: flex;
+    justify-content: end;
+    width: 20%;
+`;
+
+export const LeftSectionContainer = styled.div`
+    display: flex;
+    justify-content: end;
+    width: 20%;
+`;
+
 export const Main = styled.div`
     display: flex;
     min-height: calc(100% - ${kHeaderHeight});

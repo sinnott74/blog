@@ -1,9 +1,9 @@
 import React, { FC } from "react";
-import { Header, Main } from "./styled";
+import { Header, Main, LeftSectionContainer, RightSectionContainer } from "./styled";
 import { ROUTES } from "../../../Routes";
 import { Heading4 } from "../Typography/Typography";
 import { Link } from "../Link/Link";
-import { Box, Tiles } from "../Layout";
+import { Box } from "../Layout";
 
 interface Props {
     title?: String;
@@ -19,11 +19,11 @@ export const HeaderLayout: FC<Props> = ({
 }) => (
     <Box height="full" width="full" spacing="none">
         <Header>
-            {left}
+            <LeftSectionContainer>{left}</LeftSectionContainer>
             <Link to={ROUTES.home} noDecorate>
                 <Heading4>{title}</Heading4>
             </Link>
-            {right}
+            <RightSectionContainer>{right}</RightSectionContainer>
         </Header>
         <Main>{children}</Main>
     </Box>
