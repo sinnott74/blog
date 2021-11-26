@@ -20,17 +20,17 @@ export const Slider = styled.span`
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
+    background-color: ${(props) => props.theme.palette.background.lighter};
     transition: 0.2s;
     border-radius: 34px;
     padding: 5px;
 
     ${Input}:checked + & {
-        background-color: #2196f3;
+        background-color: ${(props) => props.theme.palette.primary.main};
     }
 
     ${Input}:focus + & {
-        box-shadow: 0 0 1px #2196f3;
+        box-shadow: ${(props) => `0 0 1px ${props.theme.palette.primary.main}`};
     }
 
     &::before {
@@ -40,7 +40,7 @@ export const Slider = styled.span`
         width: 26px;
         left: 4px;
         bottom: 4px;
-        background-color: white;
+        background-color: ${(props) => props.theme.palette.background.main};
         transition: 0.2s;
         border-radius: 50%;
     }

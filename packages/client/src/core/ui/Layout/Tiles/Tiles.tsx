@@ -1,11 +1,12 @@
 import React, { ReactNode } from "react";
-import { Spacable, Responsive } from "../util";
+import { Spacable, Responsive, WidthSizable } from "../util";
 import { TilesContainer, TilesItemContainer, TilesItem } from "./styled";
 
 export type Props = {
     columns: Responsive<number>;
     children?: ReactNode;
-} & Spacable;
+} & Spacable &
+    WidthSizable;
 
 export const Tiles = React.forwardRef<HTMLDivElement, Props>(
     ({ children, columns = 1, spacing }, ref) => {
