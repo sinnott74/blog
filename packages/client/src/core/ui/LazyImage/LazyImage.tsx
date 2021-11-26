@@ -2,6 +2,8 @@ import React, { FC, useState } from "react";
 import { Container, Placeholder, Initial, Lazy } from "./styled";
 import { useInView } from "react-intersection-observer";
 import { calculateRatio } from "./utils";
+import { Text } from "../Typography/styled";
+import { Box } from "../Layout";
 
 interface LazyImageProps {
     src: string;
@@ -11,6 +13,7 @@ interface LazyImageProps {
     className?: string;
     onClick?: () => void;
     heightToWidthRatio?: number;
+    caption?: boolean;
 }
 
 export const LazyImage: FC<LazyImageProps> = ({
@@ -21,6 +24,7 @@ export const LazyImage: FC<LazyImageProps> = ({
     className,
     onClick,
     heightToWidthRatio,
+    caption,
 }) => {
     const [ref, inView] = useInView({
         triggerOnce: true,
@@ -49,28 +53,35 @@ export const LazyImage: FC<LazyImageProps> = ({
     const ratio = calculateRatio({ heightToWidthRatio, src });
 
     return (
-        <Container ratio={ratio} className={className} ref={ref} onClick={onClick}>
-            {placeholder && <Placeholder />}
-            {initial && (
-                <Initial
-                    src={initialSrc}
-                    alt={alt}
-                    title={title}
-                    animate={initial}
-                    onLoad={handleInitialLoaded}
-                    onAnimationEnd={handleInitialImageFadeInEnd}
-                />
+        <>
+            <Container ratio={ratio} className={className} ref={ref} onClick={onClick}>
+                {placeholder && <Placeholder />}
+                {initial && (
+                    <Initial
+                        src={initialSrc}
+                        alt={alt}
+                        title={title}
+                        animate={initial}
+                        onLoad={handleInitialLoaded}
+                        onAnimationEnd={handleInitialImageFadeInEnd}
+                    />
+                )}
+                {inView && (
+                    <Lazy
+                        src={src}
+                        alt={alt}
+                        title={title}
+                        animate={lazy}
+                        onLoad={handleLazyLoaded}
+                        onAnimationEnd={handleLazyImageFadeInEnd}
+                    />
+                )}
+            </Container>
+            {caption && (
+                <Box align="center">
+                    <Text secondary>{title}</Text>
+                </Box>
             )}
-            {inView && (
-                <Lazy
-                    src={src}
-                    alt={alt}
-                    title={title}
-                    animate={lazy}
-                    onLoad={handleLazyLoaded}
-                    onAnimationEnd={handleLazyImageFadeInEnd}
-                />
-            )}
-        </Container>
+        </>
     );
 };

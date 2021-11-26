@@ -7,6 +7,7 @@ interface LazyImgurImageProps {
     title: string;
     className?: string;
     onClick?: () => void;
+    caption?: boolean;
 }
 
 const reg = /(.*)(\.)(jpg|png)(.*)/;

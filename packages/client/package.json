@@ -13,7 +13,7 @@
         "test": "NODE_OPTIONS=--experimental-vm-modules jest --coverage"
     },
     "dependencies": {
-        "@mdx-js/react": "^2.0.0-next.9",
+        "@mdx-js/react": "^2.0.0-rc.2",
         "deepmerge": "4.2.2",
         "lodash.clonedeep": "^4.5.0",
         "material-colors": "^1.2.6",
@@ -28,7 +28,7 @@
         "styled-components": "^5.3.0"
     },
     "devDependencies": {
-        "@mdx-js/loader": "^2.0.0-next.9",
+        "@mdx-js/loader": "^2.0.0-rc.2",
         "@storybook/addon-a11y": "^6.3.4",
         "@storybook/addon-actions": "^6.3.4",
         "@storybook/addon-docs": "^6.3.4",
@@ -41,6 +41,7 @@
         "@types/enzyme": "^3.10.5",
         "@types/jest": "^26.0.24",
         "@types/lodash.clonedeep": "^4.5.6",
+        "@types/mdx": "^2.0.1",
         "@types/node": "^14.12.20",
         "@types/prismjs": "~1.16.0",
         "@types/react": "^17.0.3",
