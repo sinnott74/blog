@@ -9,9 +9,16 @@ interface Props {
     // uncheckedColor?: string;
     CheckedIcon?: SVGIcon;
     UncheckedIcon?: SVGIcon;
+    className?: string;
 }
 
-export const Switch: FC<Props> = ({ checked = false, onToggle, CheckedIcon, UncheckedIcon }) => {
+export const Switch: FC<Props> = ({
+    className,
+    checked = false,
+    onToggle,
+    CheckedIcon,
+    UncheckedIcon,
+}) => {
     const onChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
             onToggle && onToggle(event.target.checked);
@@ -20,7 +27,7 @@ export const Switch: FC<Props> = ({ checked = false, onToggle, CheckedIcon, Unch
     );
 
     return (
-        <Label>
+        <Label className={className}>
             <Input type="checkbox" onChange={onChange} defaultChecked={checked} />
             <Slider>
                 {CheckedIcon && <CheckedIcon />}
