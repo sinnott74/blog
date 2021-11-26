@@ -5,7 +5,7 @@ import { Page } from "../core/ui/Page/Page";
 import { Heading1, Text } from "../core/ui/Typography/styled";
 import { ShareLinks } from "../core/ui/ShareLinks/ShareLinks";
 import { Helmet } from "react-helmet";
-import { useHistory } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../Routes";
 import { withMdx } from "../core/services/mdx";
 import { Spinner } from "../core/ui/Spinner/Spinner";
@@ -21,7 +21,7 @@ interface Props {
 }
 
 export const BlogPost: FC<Props> = ({ Post, title, imageurl, author, tags = [], date }) => {
-    const { push } = useHistory();
+    const navigate = useNavigate();
     return (
         <Page title={title}>
             <Helmet>
@@ -43,7 +43,7 @@ export const BlogPost: FC<Props> = ({ Post, title, imageurl, author, tags = [], 
                     <Tags
                         tags={tags}
                         align="center"
-                        onTagClick={(tag) => push(`${ROUTES.home}?tags=${tag}`)}
+                        onTagClick={(tag) => navigate(`${ROUTES.home}?tags=${tag}`)}
                     />
                     <ShareLinks url={window.location.href} title={title} />
                     {imageurl && <LazyImgur src={imageurl} title={title} />}

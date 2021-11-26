@@ -9,21 +9,24 @@ interface ShareLinksProps {
     title: string;
 }
 
-export const ShareLinks: FC<ShareLinksProps> = ({ url, title }) => (
-    <Inline>
-        <Link
-            to={`https://twitter.com/intent/tweet?url=${url}&text=${title}`}
-            target="blank"
-            rel={["noopener", "noreferrer"]}
-        >
-            <Twitter title="Share to Twitter" />
-        </Link>
-        <Link
-            to={`https://www.facebook.com/sharer/sharer.php?u=${url}`}
-            target="blank"
-            rel={["noopener", "noreferrer"]}
-        >
-            <Facebook title="Share to Facebook" />
-        </Link>
-    </Inline>
-);
+export const ShareLinks: FC<ShareLinksProps> = ({ url, title }) => {
+    const encodedUrl = encodeURI(url);
+    return (
+        <Inline>
+            <Link
+                to={`https://twitter.com/intent/tweet?url=${encodedUrl}&text=${title}`}
+                target="blank"
+                rel={["noopener", "noreferrer"]}
+            >
+                <Twitter title="Share to Twitter" />
+            </Link>
+            <Link
+                to={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
+                target="blank"
+                rel={["noopener", "noreferrer"]}
+            >
+                <Facebook title="Share to Facebook" />
+            </Link>
+        </Inline>
+    );
+};

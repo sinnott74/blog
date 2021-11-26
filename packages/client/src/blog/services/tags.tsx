@@ -1,5 +1,5 @@
 import React, { useContext, createContext, FC } from "react";
-import { useLocation, useHistory } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface TagsContextProps {
     tags: string[];
@@ -11,7 +11,7 @@ const TagsContext = createContext<TagsContextProps>({ tags: [], add: () => {}, r
 
 export const TagsContainer: FC = ({ children }) => {
     const location = useLocation();
-    const history = useHistory();
+    const navigate = useNavigate();
     const searchParams = new URLSearchParams(location.search);
     const tags = searchParams.getAll("tags") || [];
 
@@ -21,7 +21,7 @@ export const TagsContainer: FC = ({ children }) => {
         }
         searchParams.append("tags", tag);
         location.search = searchParams.toString();
-        history.push(location);
+        navigate(location);
     };
 
     const remove = (tag: string) => {
@@ -32,7 +32,7 @@ export const TagsContainer: FC = ({ children }) => {
         const updatedTags = tags.filter((t) => t !== tag);
         updatedTags.forEach((t) => searchParams.append("tags", t));
         location.search = searchParams.toString();
-        history.push(location);
+        navigate(location);
     };
 
     return <TagsContext.Provider value={{ tags, add, remove }}>{children}</TagsContext.Provider>;
