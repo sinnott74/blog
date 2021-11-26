@@ -58,9 +58,7 @@ export const SchemeProvider: FC = ({ children }) => {
     const isDarkMode = scheme === SCHEMES.dark;
 
     return (
-        <SchemeContext.Provider
-            value={{ scheme: SCHEMES.light, setScheme, toggleScheme, isDarkMode }}
-        >
+        <SchemeContext.Provider value={{ scheme, setScheme, toggleScheme, isDarkMode }}>
             {children}
         </SchemeContext.Provider>
     );
