@@ -8,7 +8,7 @@ interface Props {
 }
 
 export const InlineCode: FC<Props> = (props) => (
-    <Box display="inline" spacing="xxsmall" background="darker" {...props}>
+    <Box component="span" display="inline" spacing="xxsmall" background="darker" {...props}>
         <Code {...props} />
     </Box>
 );

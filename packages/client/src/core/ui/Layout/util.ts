@@ -125,7 +125,8 @@ export type Component =
     | "section"
     | "pre"
     | "ol"
-    | "ul";
+    | "ul"
+    | "span";
 
 export interface Componentable {
     component?: Component;
