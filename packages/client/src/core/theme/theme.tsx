@@ -180,7 +180,7 @@ export const withTheme = (WrappedComponent: FC) => () => {
     // const { variables, theme: variableTheme } = createCSSVariablesTheme(theme);
 
     return (
-        <StyledComponentThemeProvider theme={light}>
+        <StyledComponentThemeProvider theme={theme}>
             {/* <GlobalStyled variables={variables}> */}
             <GlobalStyle />
             <WrappedComponent />

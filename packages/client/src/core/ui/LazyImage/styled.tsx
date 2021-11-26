@@ -44,6 +44,7 @@ export const Container = styled.div<ContainerProps>`
 export const Placeholder = styled(PlaceholderSVG)<Animatable>`
     ${common}
     animation-fill-mode: backwards;
+    fill: ${(props) => props.theme.palette.background.darker};
 `;
 
 export const Initial = styled.img<Animatable>`
