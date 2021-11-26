@@ -1,8 +1,8 @@
 import React, { lazy, Suspense, FC } from "react";
-import { Switch, Route, RouteComponentProps, withRouter } from "react-router-dom";
+import { Routes as ReactRouterRoutes, Route, useLocation } from "react-router-dom";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { AbsolutelyCenteredSpinner as Spinner } from "./core/ui/Spinner/Spinner";
-import styled from "styled-components/macro";
+import styled, { createGlobalStyle } from "styled-components/macro";
 import { data } from "@routes";
 import { PostMetadata } from "./blog/services/blog";
 
@@ -19,28 +19,8 @@ const Lazy404 = lazy(() => import("./pages/404"));
 
 const postRoutes = data<PostMetadata>().map((post) => ({
     path: post.path,
-    exact: post.exact,
-    render: () => <LazyBlogPost Post={post.component} {...post.data} />,
+    element: <LazyBlogPost Post={post.component} {...post.data} />,
 }));
-
-// Array of Routes,
-export const routes = [
-    {
-        path: ROUTES.home,
-        exact: true,
-        component: LazyBlogList,
-    },
-    {
-        path: ROUTES.about,
-        exact: true,
-        component: LazyAbout,
-    },
-    ...postRoutes,
-    {
-        path: undefined, // Catch-all route for 404
-        component: Lazy404,
-    },
-];
 
 const StyledTransitionGroup = styled(TransitionGroup)`
     display: flex;
@@ -49,26 +29,52 @@ const StyledTransitionGroup = styled(TransitionGroup)`
     overflow-x: hidden;
 `;
 
-export const Routes: FC<RouteComponentProps<any, any, any>> = ({ location }) => (
-    <StyledTransitionGroup className="transition-group">
-        <CSSTransition key={location.key} timeout={{ enter: 150 }} classNames="fade" exit={false}>
-            <Suspense fallback={<Spinner />}>
-                <Switch>
-                    {routes.map((route, index) => (
-                        <Route
-                            key={index}
-                            path={route.path}
-                            exact={route.exact}
-                            //@ts-ignore
-                            render={route.render}
-                            //@ts-ignore
-                            component={route.component}
-                        />
-                    ))}
-                </Switch>
-            </Suspense>
-        </CSSTransition>
-    </StyledTransitionGroup>
-);
+const TransitionStyle = createGlobalStyle`
+.fade-enter {
+  opacity: 0.01;
+}
 
-export default withRouter(Routes);
+.fade-enter.fade-enter-active {
+  opacity: 1;
+  transition: opacity 150ms ease-in;
+}
+
+.fade-exit {
+  opacity: 1;
+}
+
+.fade-exit.fade-exit-active {
+  opacity: 0.01;
+  transition: opacity 150ms ease-in;
+}
+`;
+
+export const Routes: FC<{}> = () => {
+    const location = useLocation();
+    return (
+        <>
+            <TransitionStyle />
+            <StyledTransitionGroup className="transition-group">
+                <CSSTransition
+                    key={location.key}
+                    timeout={{ enter: 150 }}
+                    classNames="fade"
+                    exit={false}
+                >
+                    <Suspense fallback={<Spinner />}>
+                        <ReactRouterRoutes>
+                            <Route path={ROUTES.home} element={<LazyBlogList />} />
+                            <Route path={ROUTES.about} element={<LazyAbout />} />
+                            {postRoutes.map((route, index) => (
+                                <Route key={index} path={route.path} element={route.element} />
+                            ))}
+                            <Route path="*" element={<Lazy404 />} />
+                        </ReactRouterRoutes>
+                    </Suspense>
+                </CSSTransition>
+            </StyledTransitionGroup>
+        </>
+    );
+};
+
+export default Routes;

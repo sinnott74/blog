@@ -1,7 +1,6 @@
 import React, { FC } from "react";
-import { NavLink, NavLinkProps, withRouter, RouteComponentProps } from "react-router-dom";
+import { NavLink, NavLinkProps } from "react-router-dom";
 import styled from "styled-components/macro";
-import { Location } from "history";
 
 type LinkRel = "nofollow" | "noopener" | "noreferrer";
 
@@ -9,11 +8,10 @@ interface LinkProps {
     to: string;
     className?: string;
     activeClassName?: string;
-    exact?: boolean;
+    end?: boolean;
     title?: string;
     disabled?: boolean;
     onClick?: () => void;
-    location: Location;
     search?: string;
     noDecorate?: boolean;
     target?: "blank";
@@ -25,43 +23,31 @@ const StyledNavLink = styled(NavLink)<NavLinkProps & { disabled?: boolean; noDec
     text-decoration: ${({ noDecorate }) => (noDecorate ? "none" : "initial")};
 `;
 
-export const InternalLink: FC<LinkProps & RouteComponentProps<any, any, any>> = ({
-    className,
-    activeClassName,
-    exact,
+export const Link: FC<LinkProps> = ({
+    end,
     onClick,
     title,
     to,
     children,
     disabled,
-    location,
     search,
     noDecorate,
     target,
     rel,
-}) => {
-    return (
-        <StyledNavLink
-            className={className}
-            activeClassName={activeClassName}
-            exact={exact}
-            onClick={onClick}
-            title={title}
-            disabled={disabled}
-            noDecorate={noDecorate}
-            target={target}
-            to={{
-                pathname: to,
-                search: search,
-                state: {
-                    from: location.pathname,
-                },
-            }}
-            rel={Array.isArray(rel) ? rel.join(" ") : rel}
-        >
-            {children}
-        </StyledNavLink>
-    );
-};
-
-export const Link = withRouter(InternalLink);
+}) => (
+    <StyledNavLink
+        end={end}
+        onClick={onClick}
+        title={title}
+        disabled={disabled}
+        noDecorate={noDecorate}
+        target={target}
+        to={{
+            pathname: to,
+            search: search,
+        }}
+        rel={Array.isArray(rel) ? rel.join(" ") : rel}
+    >
+        {children}
+    </StyledNavLink>
+);
