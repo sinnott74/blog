@@ -14,6 +14,8 @@ import macrosPlugin from "vite-plugin-babel-macros";
 
 import analyze from "rollup-plugin-analyzer";
 
+import rehypePrism from "@mapbox/rehype-prism";
+
 import { SourceMapGenerator } from "source-map";
 
 // @ts-ignore
@@ -24,7 +26,7 @@ const options = {
     // See https://mdxjs.com/advanced/plugins
     remarkPlugins: [gfm, frontmatter, remarkMdxFrontmatter, unwrapImages],
     // E.g. `remark-frontmatter`
-    rehypePlugins: [],
+    rehypePlugins: [rehypePrism],
     providerImportSource: "@mdx-js/react",
     SourceMapGenerator,
 };
