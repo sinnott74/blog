@@ -1509,6 +1509,15 @@
     "@types/mdx" "^2.0.0"
     "@types/react" ">=16"
 
+"@mdx-js/rollup@^2.0.0-rc.2":
+  version "2.0.0-rc.2"
+  resolved "https://registry.yarnpkg.com/@mdx-js/rollup/-/rollup-2.0.0-rc.2.tgz#204843333f34ccbdc9aedf5630251a7a0c5c0d4c"
+  integrity sha512-H/Y+D3vlzEqSFZ8ZQsg4R4ARDFVFyjbnwrm1i7OguFRGDWZkd+cCDlFhFB5PXN8QmMErxD0zTLpyptpijDXSow==
+  dependencies:
+    "@mdx-js/mdx" "^2.0.0-rc.2"
+    "@rollup/pluginutils" "^4.0.0"
+    source-map "^0.7.0"
+
 "@mdx-js/util@1.6.22":
   version "1.6.22"
   resolved "https://registry.yarnpkg.com/@mdx-js/util/-/util-1.6.22.tgz#219dfd89ae5b97a8801f015323ffa4b62f45718b"
@@ -1583,7 +1592,7 @@
     prop-types "^15.6.1"
     react-lifecycles-compat "^3.0.4"
 
-"@rollup/pluginutils@^4.1.0":
+"@rollup/pluginutils@^4.0.0", "@rollup/pluginutils@^4.1.0":
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/@rollup/pluginutils/-/pluginutils-4.1.1.tgz#1d4da86dd4eded15656a57d933fda2b9a08d47ec"
   integrity sha512-clDjivHqWGXi7u+0d2r2sBi4Ie6VLEAzWMIkvJLnDmxoOhBYOTfzGbOQBA32THHm11/LiJbd01tJUpJsbshSWQ==

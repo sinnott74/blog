@@ -3,7 +3,7 @@ import Highlight, { defaultProps, Language } from "prism-react-renderer";
 import light from "prism-react-renderer/themes/vsLight";
 import dark from "prism-react-renderer/themes/vsDark";
 import { useColorScheme } from "../../services/colorScheme";
-import { Card } from "../Layout";
+import { Box, Card } from "../Layout";
 import { Code as CodeText } from "../Typography/Typography";
 
 interface Props {
@@ -11,7 +11,7 @@ interface Props {
     children: string;
 }
 
-export const Code: FC<Props> = ({ children, className }) => {
+export const BlockCode: FC<Props> = ({ children, className }) => {
     const { scheme } = useColorScheme();
     const themes = {
         light,
@@ -43,4 +43,15 @@ export const Code: FC<Props> = ({ children, className }) => {
             )}
         </Highlight>
     );
+};
+
+export const InlineCode: FC<Props> = (props) => (
+    <Box component="span" display="inline" spacing="xxsmall" background="darker" {...props}>
+        <CodeText {...props} />
+    </Box>
+);
+
+export const Code: FC<Props> = ({ children, className }) => {
+    const CodeType = className?.includes("language-") ? BlockCode : InlineCode;
+    return <CodeType className={className}>{children}</CodeType>;
 };

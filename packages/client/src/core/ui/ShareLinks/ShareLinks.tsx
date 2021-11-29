@@ -44,8 +44,9 @@ export const ShareLinks: FC<ShareLinksProps> = ({ url, title }) => {
     const encodedTitle = encodeURIComponent(title);
     return (
         <Inline>
-            {shareTargets.map(({ href, Icon }) => (
+            {shareTargets.map(({ href, Icon }, index) => (
                 <a
+                    key={index}
                     href={href({ url: encodedUrl, title: encodedTitle })}
                     target="blank"
                     rel="noopener noreferrer"

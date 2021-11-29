@@ -12,7 +12,6 @@ import { Line } from "../ui/Line/Line";
 
 import { MDXProvider } from "@mdx-js/react";
 import { Code } from "../ui/Code/Code";
-import { InlineCode } from "../ui/Code/InlineCode";
 import { Stack } from "../ui/Layout";
 import { Row, DataCell, HeaderCell } from "../ui/Table";
 import { ListItem, OrderedList, UnorderedList } from "../ui/List/List";
@@ -22,7 +21,7 @@ import { LazyImgur } from "../ui/LazyImage/LazyImgur";
 const Children: FC = ({ children }) => <>{children}</>;
 const Wrapper: FC = (props) => <Stack spacing="medium" {...props} />;
 
-const components: any = {
+export const components: any = {
     h1: Heading1,
     h2: Heading2,
     h3: Heading3,
@@ -32,7 +31,6 @@ const components: any = {
     img: (props: any) => <LazyImgur {...props} caption />,
     p: Text,
     hr: Line,
-    inlineCode: InlineCode,
     code: Code,
     pre: Children,
     wrapper: Wrapper,
