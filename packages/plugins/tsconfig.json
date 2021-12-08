@@ -5,7 +5,9 @@
         "module": "ESNext",
         "noEmit": false,
         "types": ["vite/client"],
-        "typeRoots": ["./src/typings", "./node_modules/@types"]
+        "declaration": true,
+        "declarationMap": true,
+        "typeRoots": ["./src/types.d.ts", "./node_modules/@types"]
     },
     "include": ["./src/index.ts"]
 }

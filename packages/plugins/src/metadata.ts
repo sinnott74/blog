@@ -1,8 +1,6 @@
 import type { Plugin } from "vite";
 import { getPostsMetaData } from "./common.js";
 
-const ID = "@metadata";
-
 function makeModuleContent() {
     const postMetadata = getPostsMetaData();
     return `export const data = () => [${Object.values(postMetadata)
@@ -12,9 +10,10 @@ function makeModuleContent() {
 
 interface Options {}
 
+const ID = "virtual:metadata";
 export default function ({}: Options = {}): Plugin {
     return {
-        name: "metadata",
+        name: ID,
         resolveId(id) {
             if (id === ID) {
                 return ID;

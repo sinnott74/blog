@@ -4,7 +4,7 @@ import { BlogCard, Props as BlogCardProps } from "../BlogCard/BlogCard";
 import { Pagination } from "../../../core/ui/Pagination/Pagination";
 import { Tags } from "../Tags";
 import { Box, Stack } from "../../../core/ui/Layout";
-import { data } from "@metadata";
+import { data } from "virtual:metadata";
 import { PostMetadata } from "../../services/blog";
 
 const useBlogPosts = () =>

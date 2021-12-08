@@ -3,7 +3,7 @@ import { Routes as ReactRouterRoutes, Route, useLocation } from "react-router-do
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { AbsolutelyCenteredSpinner as Spinner } from "./core/ui/Spinner/Spinner";
 import styled, { createGlobalStyle } from "styled-components/macro";
-import { data } from "@routes";
+import { data } from "virtual:routes";
 import { PostMetadata } from "./blog/services/blog";
 
 export const ROUTES = {
