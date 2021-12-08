@@ -6,10 +6,18 @@
     "private": true,
     "workspaces": {
         "packages": [
+            "packages/plugins",
             "packages/client"
         ],
         "nohoist": [
             "**/*"
         ]
+    },
+    "scripts": {
+        "start": "yarn workspace @internal/plugins build && yarn workspace client start",
+        "build": "yarn workspace @internal/plugins build && yarn workspace client build"
+    },
+    "dependencies": {
+        "typescript": "^4.2.4"
     }
 }

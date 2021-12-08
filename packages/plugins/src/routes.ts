@@ -1,7 +1,5 @@
 import type { Plugin } from "vite";
-import { getPostsMetaData } from "./common";
-
-const ID = "@routes";
+import { getPostsMetaData } from "./common.js";
 
 export function makeModuleContent() {
     const postMetadata = getPostsMetaData();
@@ -35,9 +33,10 @@ export function makeModuleContent() {
 
 interface Options {}
 
+const ID = "virtual:routes";
 export default function ({}: Options = {}): Plugin {
     return {
-        name: "routes",
+        name: ID,
         resolveId(id) {
             if (id === ID) {
                 return ID;

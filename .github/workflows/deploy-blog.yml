@@ -13,7 +13,7 @@ jobs:
       - name: Install and Build 🔧
         run: |
           yarn install
-          VITE_BASE_URL=/blog/ yarn workspace client build
+          VITE_BASE_URL=/blog/ yarn build
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:

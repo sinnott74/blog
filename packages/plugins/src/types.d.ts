@@ -1,8 +1,8 @@
-declare module "@metadata" {
+declare module "@virtual/metadata" {
     export const data: <T>() => T[];
 }
 
-declare module "@routes" {
+declare module "@virtual/routes" {
     export const data: <T>() => {
         path: string;
         exact: boolean;
