@@ -5,7 +5,7 @@ import { Pagination } from "../../../core/ui/Pagination/Pagination";
 import { Tags } from "../Tags";
 import { Box, Stack } from "../../../core/ui/Layout";
 import { data } from "@metadata";
-import { PostMetadata } from "src/blog/services/blog";
+import { PostMetadata } from "../../services/blog";
 
 const useBlogPosts = () =>
     data<PostMetadata>().sort(

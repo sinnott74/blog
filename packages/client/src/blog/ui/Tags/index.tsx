@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import { Chip } from "../../../core/ui/Chip/Chip";
 import { Inline } from "../../../core/ui/Layout";
-import { Align } from "src/core/ui/Layout/util";
+import { Align } from "../../..//core/ui/Layout/util";
 
 interface Props {
     align?: Align;

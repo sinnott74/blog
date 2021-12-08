@@ -1,4 +1,5 @@
-import CSS from "csstype";
+import { Theme } from "../../theme/theme";
+import { css } from "styled-components";
 
 /******************************
  * Repsonsive
@@ -51,9 +52,6 @@ export const getResponsive = <P>(
 /******************************
  * Alignment
  ******************************/
-
-import { Theme } from "src/core/theme/theme";
-import { css, CSSProperties } from "styled-components";
 
 export type Align = "start" | "center";
 export type RepsonsiveAlign = Responsive<Align>;
