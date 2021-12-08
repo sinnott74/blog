@@ -6,10 +6,14 @@
     "private": true,
     "workspaces": {
         "packages": [
+            "packages/plugins",
             "packages/client"
         ],
         "nohoist": [
             "**/*"
         ]
+    },
+    "dependencies": {
+        "typescript": "^4.2.4"
     }
 }
