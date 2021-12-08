@@ -28,3 +28,5 @@ export const Stack = React.forwardRef<HTMLDivElement, Props>(
         );
     },
 );
+
+export { StackItem, StackContainer };
