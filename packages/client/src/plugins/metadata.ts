@@ -1,5 +1,5 @@
 import type { Plugin } from "vite";
-import { getPostsMetaData } from "./common.js";
+import { getPostsMetaData } from "./common";
 
 function makeModuleContent() {
     const postMetadata = getPostsMetaData();

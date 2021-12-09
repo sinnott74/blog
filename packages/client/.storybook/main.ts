@@ -1,7 +1,7 @@
-const svgr = require("vite-plugin-svgr");
-const macrosPlugin = require("vite-plugin-babel-macros");
-
-exports.default = {
+import { UserConfig } from "vite";
+import svgr from "vite-plugin-svgr";
+import macrosPlugin from "vite-plugin-babel-macros";
+export default {
     core: {
         builder: "storybook-builder-vite",
     },
@@ -12,11 +12,12 @@ exports.default = {
         "@storybook/addon-storysource",
         // "@storybook/addon-viewport",
     ],
-    viteFinal: async (config) => {
-        const { metadata, routes, mdx } = await import("@internal/plugins");
+    viteFinal: async (config: UserConfig) => {
+        const { metadata, routes, mdx: mdxPromise } = await import("../src/plugins/");
+        const mdx = await mdxPromise();
         // mdx is already included in the plugins (at index 2). Removing it so we can configure it ourselves
         // https://github.com/eirslett/storybook-builder-vite/blob/main/packages/storybook-builder-vite/vite-config.js
-        config.plugins?.splice(2, 1, metadata(), routes(), svgr(), mdx(), macrosPlugin.default());
+        config.plugins?.splice(2, 1, metadata(), routes(), svgr(), mdx(), macrosPlugin());
         return config;
     },
 };
