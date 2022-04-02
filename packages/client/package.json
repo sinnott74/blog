@@ -13,7 +13,7 @@
         "test": "NODE_OPTIONS=--experimental-vm-modules jest --coverage"
     },
     "dependencies": {
-        "@mdx-js/react": "^2.0.0-rc.2",
+        "@mdx-js/react": "^2.1.1",
         "deepmerge": "4.2.2",
         "lodash.clonedeep": "^4.5.0",
         "material-colors": "^1.2.6",
@@ -32,8 +32,8 @@
         "@babel/plugin-syntax-typescript": "^7.16.7",
         "@babel/types": "^7.16.0",
         "@mapbox/rehype-prism": "^0.8.0",
-        "@mdx-js/loader": "^2.0.0-rc.2",
-        "@mdx-js/rollup": "^2.0.0-rc.2",
+        "@mdx-js/loader": "^2.1.1",
+        "@mdx-js/rollup": "^2.1.1",
         "@storybook/addon-a11y": "^6.4.8",
         "@storybook/addon-actions": "^6.4.8",
         "@storybook/addon-docs": "^6.4.8",
