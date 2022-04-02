@@ -1,4 +1,4 @@
-import styled, { DefaultTheme, keyframes, css } from "styled-components/macro";
+import styled, { keyframes, css } from "styled-components/macro";
 import { token } from "virtual:theme";
 
 type Type = "default" | "text" | "icon";
@@ -13,10 +13,6 @@ export interface ButtonBaseProps {
     disabled?: boolean;
     outlined?: boolean;
     selected?: boolean;
-}
-
-interface States {
-    hover?: boolean;
 }
 
 const getBackgroundColor = ({ disabled, type, palette, selected }: ButtonBaseProps) => {
