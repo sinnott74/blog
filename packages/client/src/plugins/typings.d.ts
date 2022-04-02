@@ -10,5 +10,3 @@ declare module "virtual:routes" {
         data: T;
     }[];
 }
-
-import "./theme/typings";
