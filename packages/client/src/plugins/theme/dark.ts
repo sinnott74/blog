@@ -76,7 +76,7 @@ export const dark: Theme = {
     "color-overlay-pressed": colors.DN500A,
     "color-text-selected": colors.B400,
     "color-text-highEmphasis": colors.DN1000,
-    "color-text-mediumEmphasis": colors.DN800,
+    "color-text-mediumEmphasis": colors.DN900,
     "color-text-lowEmphasis": colors.DN700,
     "color-text-onBold": colors.DN0,
     "color-text-onBoldWarning": colors.DN0,

@@ -123,30 +123,35 @@ const DarkThemeCode = styled(CodeText)`
     }
 `;
 
-const StyledCodeBox = styled(Box)`
-    background-color: ${token("color-background-subtleNeutral-resting")};
-    border-left: calc(${token("spacing")} / 2) solid ${token("color-background-boldBrand-resting")};
-`;
-
-export const BlockCode: FC<Props> = ({ children, className }) => {
+const ThemedCode: FC<Props> = ({ children }) => {
     const { isDarkMode } = useColorScheme();
     const ThemeCode = isDarkMode ? DarkThemeCode : LightThemeCode;
+    return <ThemeCode>{children}</ThemeCode>;
+};
 
+export const BlockCode: FC<Props> = ({ children, className }) => {
     return (
-        <StyledCodeBox forwardedAs="pre" className={className}>
-            <ThemeCode>{children}</ThemeCode>
-        </StyledCodeBox>
+        <Box
+            component="pre"
+            className={className}
+            accent
+            background={token("color-background-subtleNeutral-resting")}
+        >
+            <ThemedCode>{children}</ThemedCode>
+        </Box>
     );
 };
 
-const StyledInlineCodebox = styled(Box)`
-    background-color: ${token("color-background-subtleNeutral-resting")};
-`;
-
 export const InlineCode: FC<Props> = (props) => (
-    <StyledInlineCodebox component="span" display="inline" spacing="xxsmall" {...props}>
+    <Box
+        component="span"
+        display="inline"
+        spacing="xxsmall"
+        background={token("color-background-subtleNeutral-resting")}
+        {...props}
+    >
         <CodeText {...props} />
-    </StyledInlineCodebox>
+    </Box>
 );
 
 export const Code: FC<Props> = ({ children, className }) => {

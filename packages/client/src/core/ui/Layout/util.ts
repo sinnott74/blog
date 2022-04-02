@@ -24,28 +24,53 @@ export const getResponsive = <P>(
     getValue: (p?: P) => string,
     responsive?: Responsive<P>,
 ) => {
-    const fallback = getValue();
-    const mobile = getValue(getResponsiveValue("mobile", responsive));
-    const tablet = getValue(getResponsiveValue("tablet", responsive));
-    const desktop = getValue(getResponsiveValue("desktop", responsive));
+    const rules = [];
+    rules.push(`${property}: ${getValue()};`);
+
     const wide = getValue(getResponsiveValue("wide", responsive));
-
-    return `
-        ${property}: ${fallback};
-
-        @media (min-width: 1920px) {
+    if (wide) {
+        rules.push(` @media (min-width: 1920px) {
             ${property}: ${wide};
-        }
-        @media (max-width: 1920px) {
+        }`);
+    }
+    const desktop = getValue(getResponsiveValue("desktop", responsive));
+    if (desktop) {
+        rules.push(`@media (max-width: 1920px) {
             ${property}:${desktop};
-        }
-        @media (max-width: 1024px) {
+        }`);
+    }
+
+    const tablet = getValue(getResponsiveValue("tablet", responsive));
+    if (tablet) {
+        rules.push(`@media (max-width: 1024px) {
             ${property}: ${tablet};
-        }
-        @media (max-width: 768px) {
+        }`);
+    }
+    const mobile = getValue(getResponsiveValue("mobile", responsive));
+    if (mobile) {
+        rules.push(`@media (max-width: 768px) {
             ${property}: ${mobile};
-        }
-    `;
+        }`);
+    }
+
+    return rules.join("\n");
+
+    // return `
+    //     ${property}: ${fallback};
+
+    //     @media (min-width: 1920px) {
+    //         ${property}: ${wide};
+    //     }
+    //     @media (max-width: 1920px) {
+    //         ${property}:${desktop};
+    //     }
+    //     @media (max-width: 1024px) {
+    //         ${property}: ${tablet};
+    //     }
+    //     @media (max-width: 768px) {
+    //         ${property}: ${mobile};
+    //     }
+    // `;
 };
 
 /******************************
@@ -158,7 +183,7 @@ export interface HeightSizable {
 /******************************
  * Background
  ******************************/
-export type Background = "lighter" | "main" | "darker";
+export type Background = "lighter" | "main" | "darker" | string;
 
 export interface Backgroundable {
     background?: Background;
@@ -170,9 +195,13 @@ export const getBackground = (background: Background) => {
             return token("color-background-selected-resting");
         case "darker":
             return token("color-background-selected-resting");
-        default:
-            return token("color-background-selected-resting");
     }
+
+    if (background) {
+        return background;
+    }
+
+    return token("color-background-selected-resting");
 };
 
 /******************************
