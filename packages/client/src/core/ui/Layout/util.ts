@@ -1,5 +1,4 @@
-import { Theme } from "../../theme/theme";
-import { css } from "styled-components";
+import { token } from "virtual:theme";
 
 /******************************
  * Repsonsive
@@ -31,20 +30,20 @@ export const getResponsive = <P>(
     const desktop = getValue(getResponsiveValue("desktop", responsive));
     const wide = getValue(getResponsiveValue("wide", responsive));
 
-    return css`
-        ${`${property}: ${fallback}`};
+    return `
+        ${property}: ${fallback};
 
         @media (min-width: 1920px) {
-            ${`${property}: ${wide}`};
+            ${property}: ${wide};
         }
         @media (max-width: 1920px) {
-            ${`${property}:${desktop}`};
+            ${property}:${desktop};
         }
         @media (max-width: 1024px) {
-            ${`${property}: ${tablet}`};
+            ${property}: ${tablet};
         }
         @media (max-width: 768px) {
-            ${`${property}: ${mobile}`};
+            ${property}: ${mobile};
         }
     `;
 };
@@ -93,12 +92,12 @@ const spacingRatios = {
     xxlarge: 16,
 } as const;
 
-export const getSpacing = (base: number, multiplier: number = 1) => (
-    spacing: Spacing = "small",
-) => {
-    const spaceRatio = spacingRatios[spacing] ?? 1;
-    return base * spaceRatio * multiplier + "px;";
-};
+export const getSpacing =
+    (multiplier: number = 1) =>
+    (spacing: Spacing = "small") => {
+        const spaceRatio = spacingRatios[spacing] ?? 1;
+        return `calc(${token("spacing")} * ${multiplier * spaceRatio})`;
+    };
 
 export interface Spacable {
     spacing?: RepsonsiveSpacing;
@@ -165,8 +164,15 @@ export interface Backgroundable {
     background?: Background;
 }
 
-export const getBackground = (background: Background, theme: Theme) => {
-    return theme.palette.background[background];
+export const getBackground = (background: Background) => {
+    switch (background) {
+        case "lighter":
+            return token("color-background-selected-resting");
+        case "darker":
+            return token("color-background-selected-resting");
+        default:
+            return token("color-background-selected-resting");
+    }
 };
 
 /******************************

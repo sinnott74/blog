@@ -1,10 +1,11 @@
 import styled from "styled-components/macro";
+import { token } from "virtual:theme";
 
 export const Line = styled.hr`
-    background-color: ${(props) => props.theme.palette.primary.main};
+    background-color: ${token("color-background-boldBrand-resting")};
     border: 0px;
     width: 50%;
-    height: ${(props) => props.theme.spacing + "px"};
+    height: ${token("spacing")};
     border-radius: 5px;
     max-width: 430px;
     clear: both;

@@ -35,7 +35,7 @@ export type Props = { className?: string; style?: CSS.Properties } & Spacable &
     MaxWidthable &
     Displayable;
 
-export const Box: FC<Props> = (props) => <BoxInner as={props.component} {...props} />;
+export const Box: FC<Props> = ({ component, ...rest }) => <BoxInner as={component} {...rest} />;
 
 export const BoxInner = styled.div<Props>`
     position: relative;
@@ -45,42 +45,25 @@ export const BoxInner = styled.div<Props>`
     flex-direction: column;
     overflow: auto;
     ${(props) => getResponsive<Align>("align-items", getAlignment, props.align)}
-    ${(props) => getResponsive<Spacing>("padding", getSpacing(props.theme.spacing), props.spacing)}
+    ${(props) => getResponsive<Spacing>("padding", getSpacing(), props.spacing)}
     ${(props) =>
         props.spacingTop
-            ? getResponsive<Spacing>(
-                  "padding-top",
-                  getSpacing(props.theme.spacing),
-                  props.spacingTop,
-              )
+            ? getResponsive<Spacing>("padding-top", getSpacing(), props.spacingTop)
             : ""}
     ${(props) =>
         props.spacingRight
-            ? getResponsive<Spacing>(
-                  "padding-right",
-                  getSpacing(props.theme.spacing),
-                  props.spacingRight,
-              )
+            ? getResponsive<Spacing>("padding-right", getSpacing(), props.spacingRight)
             : ""}
     ${(props) =>
         props.spacingBottom
-            ? getResponsive<Spacing>(
-                  "padding-bottom",
-                  getSpacing(props.theme.spacing),
-                  props.spacingBottom,
-              )
+            ? getResponsive<Spacing>("padding-bottom", getSpacing(), props.spacingBottom)
             : ""}
     ${(props) =>
         props.spacingLeft
-            ? getResponsive<Spacing>(
-                  "padding-left",
-                  getSpacing(props.theme.spacing),
-                  props.spacingLeft,
-              )
+            ? getResponsive<Spacing>("padding-left", getSpacing(), props.spacingLeft)
             : ""}
     margin: 0;
-    background-color: ${(props) =>
-        props.background && getBackground(props.background, props.theme)};
+    background-color: ${(props) => props.background && getBackground(props.background)};
     ${(props) =>
         props.maxWidth ? getResponsive<MaxWidth>("max-width", getMaxWidth, props.maxWidth) : ""}
 `;

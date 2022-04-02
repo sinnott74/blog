@@ -1,4 +1,5 @@
 import styled, { keyframes } from "styled-components/macro";
+import { token } from "virtual:theme";
 
 const rotate = keyframes`
   from {
@@ -37,7 +38,7 @@ export const Container = styled.div`
 
 export const Circle = styled.circle`
     box-sizing: border-box;
-    stroke: ${(props) => props.theme.palette.primary.main};
+    stroke: ${token("color-background-boldBrand-resting")};
     stroke-width: 3px;
     transform-origin: 50%;
     animation: ${line} 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite, ${rotate} 1.6s linear infinite;

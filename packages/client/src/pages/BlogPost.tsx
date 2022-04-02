@@ -2,7 +2,7 @@ import React, { FC, Suspense } from "react";
 import { LazyImgur } from "../core/ui/LazyImage/LazyImgur";
 import { Card, Stack } from "../core/ui/Layout";
 import { Page } from "../core/ui/Page/Page";
-import { Heading1, Text } from "../core/ui/Typography/styled";
+import { Heading1, SecondaryText } from "../core/ui/Typography/styled";
 import { ShareLinks } from "../core/ui/ShareLinks/ShareLinks";
 import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
@@ -37,9 +37,9 @@ export const BlogPost: FC<Props> = ({ Post, title, imageurl, author, tags = [], 
             >
                 <Stack align="center">
                     <Heading1>{title}</Heading1>
-                    <Text secondary>
+                    <SecondaryText>
                         {date} By {author}
-                    </Text>
+                    </SecondaryText>
                     <Tags
                         tags={tags}
                         align="center"

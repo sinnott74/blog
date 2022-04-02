@@ -1,5 +1,6 @@
 import styled from "styled-components/macro";
 import background from "../../images/bg-shapes.svg";
+import { token } from "virtual:theme";
 
 const kHeaderHeight = "56px";
 
@@ -19,7 +20,7 @@ export const Header = styled.div`
     align-items: center;
     align-content: center;
     z-index: 1;
-    padding: ${(props) => `0 ${props.theme.spacing}px`};
+    padding: ${(props) => `0 ${token("spacing")}`};
 `;
 
 export const RightSectionContainer = styled.div`

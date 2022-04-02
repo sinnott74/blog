@@ -53,7 +53,7 @@ Webclient] and [Blog Server] respectively.
 All requests are currently routed through the NGINX server. Any request to /api/ is forwarded onto
 the API server using the following snippet from the web client's nginx.conf:
 
-```
+```nginx
 location /api/ {
     proxy_pass <%= ENV["BACKEND_ADDR"] %>;
 }
