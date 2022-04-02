@@ -19,17 +19,13 @@ export const Button: FC<ButtonProps> = ({
     className,
     onClick,
     disableRipple,
-    primary,
-    secondary,
-    warning,
     disableElevation,
-    textButton,
     disabled,
     outlined,
-    small,
-    medium,
-    large,
-    icon,
+    size,
+    type,
+    palette,
+    selected,
 }) => {
     const [animate, setAnimate] = useState(false);
     const [origin, setOrigin] = useState<Origin>(kInitialOrigin);
@@ -55,17 +51,13 @@ export const Button: FC<ButtonProps> = ({
     return (
         <ButtonBase
             className={className}
-            primary={primary}
-            secondary={secondary}
-            warning={warning}
             disableElevation={disableElevation}
-            textButton={textButton}
             disabled={disabled}
             outlined={outlined}
-            small={small}
-            medium={medium}
-            large={large}
-            icon={icon}
+            size={size}
+            palette={palette}
+            type={type}
+            selected={selected}
             onClick={handleClick}
         >
             {children}
