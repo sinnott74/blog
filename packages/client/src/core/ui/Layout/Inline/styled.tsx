@@ -10,10 +10,8 @@ import {
 } from "../util";
 
 export const InlineContainer = styled.div<Spacable & Alignable>`
-    ${(props) =>
-        getResponsive<Spacing>("margin-left", getSpacing(props.theme.spacing, -1), props.spacing)}
-    ${(props) =>
-        getResponsive<Spacing>("margin-top", getSpacing(props.theme.spacing, -1), props.spacing)}
+    ${(props) => getResponsive<Spacing>("margin-left", getSpacing(-1), props.spacing)}
+    ${(props) => getResponsive<Spacing>("margin-top", getSpacing(-1), props.spacing)}
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
@@ -24,8 +22,6 @@ export const InlineItem = styled.div<Spacable>`
     justify-content: flex-start;
     display: block;
     min-width: 0;
-    ${(props) =>
-        getResponsive<Spacing>("padding-left", getSpacing(props.theme.spacing), props.spacing)}
-    ${(props) =>
-        getResponsive<Spacing>("padding-top", getSpacing(props.theme.spacing), props.spacing)}
+    ${(props) => getResponsive<Spacing>("padding-left", getSpacing(), props.spacing)}
+    ${(props) => getResponsive<Spacing>("padding-top", getSpacing(), props.spacing)}
 `;

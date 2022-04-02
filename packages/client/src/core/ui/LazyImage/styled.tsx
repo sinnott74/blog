@@ -1,4 +1,5 @@
 import styled, { css, keyframes } from "styled-components/macro";
+import { token } from "virtual:theme";
 import { ReactComponent as PlaceholderSVG } from "./placeholder.svg";
 
 interface Animatable {
@@ -44,7 +45,7 @@ export const Container = styled.div<ContainerProps>`
 export const Placeholder = styled(PlaceholderSVG)<Animatable>`
     ${common}
     animation-fill-mode: backwards;
-    fill: ${(props) => props.theme.palette.background.darker};
+    fill: ${token("color-background-subtleNeutral-resting")};
 `;
 
 export const Initial = styled.img<Animatable>`
