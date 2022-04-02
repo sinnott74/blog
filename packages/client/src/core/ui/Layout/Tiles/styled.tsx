@@ -15,7 +15,7 @@ export const TilesContainer = styled.div<Spacable & WidthSizable>`
     flex-wrap: wrap;
     align-items: stretch;
     justify-content: center;
-    width: ${(props) => getResponsive<Size>("width", getSizing, props.width)};
+    width: ${(props) => props.width && getResponsive<Size>("width", getSizing, props.width)};
     ${(props) => getResponsive<Spacing>("margin-top", getSpacing(-1), props.spacing)}
     ${(props) => getResponsive<Spacing>("margin-left", getSpacing(-1), props.spacing)}
 `;
