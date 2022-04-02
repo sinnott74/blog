@@ -70,7 +70,13 @@ const PaginationSelector = ({
     const PageButtons = Array.from({ length: numPages }).map((_, i) => {
         const isCurrent = page === i + 1;
         return (
-            <Button icon key={i + 1} primary={isCurrent} onClick={() => onPageChange(i + 1)}>
+            <Button
+                type="icon"
+                key={i + 1}
+                palette={isCurrent ? "primary" : undefined}
+                selected={isCurrent}
+                onClick={() => onPageChange(i + 1)}
+            >
                 <Text>{i + 1}</Text>
             </Button>
         );
@@ -78,11 +84,11 @@ const PaginationSelector = ({
 
     return (
         <Inline align="center">
-            <Button icon disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
+            <Button type="icon" disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
                 <ChevronLeft />
             </Button>
             {PageButtons}
-            <Button icon disabled={page >= numPages} onClick={() => onPageChange(page + 1)}>
+            <Button type="icon" disabled={page >= numPages} onClick={() => onPageChange(page + 1)}>
                 <ChevronRight />
             </Button>
         </Inline>
