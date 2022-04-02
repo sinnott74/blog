@@ -1,4 +1,3 @@
-import { Theme } from "../../theme/theme";
 import { token } from "virtual:theme";
 
 /******************************
@@ -93,10 +92,12 @@ const spacingRatios = {
     xxlarge: 16,
 } as const;
 
-export const getSpacing = (multiplier: number = 1) => (spacing: Spacing = "small") => {
-    const spaceRatio = spacingRatios[spacing] ?? 1;
-    return `calc(${token("spacing")} * ${multiplier * spaceRatio})`;
-};
+export const getSpacing =
+    (multiplier: number = 1) =>
+    (spacing: Spacing = "small") => {
+        const spaceRatio = spacingRatios[spacing] ?? 1;
+        return `calc(${token("spacing")} * ${multiplier * spaceRatio})`;
+    };
 
 export interface Spacable {
     spacing?: RepsonsiveSpacing;
@@ -163,8 +164,15 @@ export interface Backgroundable {
     background?: Background;
 }
 
-export const getBackground = (background: Background, theme: Theme) => {
-    return token("color-background-selected-resting");
+export const getBackground = (background: Background) => {
+    switch (background) {
+        case "lighter":
+            return token("color-background-selected-resting");
+        case "darker":
+            return token("color-background-selected-resting");
+        default:
+            return token("color-background-selected-resting");
+    }
 };
 
 /******************************

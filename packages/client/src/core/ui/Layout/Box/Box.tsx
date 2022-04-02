@@ -63,8 +63,7 @@ export const BoxInner = styled.div<Props>`
             ? getResponsive<Spacing>("padding-left", getSpacing(), props.spacingLeft)
             : ""}
     margin: 0;
-    background-color: ${(props) =>
-        props.background && getBackground(props.background, props.theme)};
+    background-color: ${(props) => props.background && getBackground(props.background)};
     ${(props) =>
         props.maxWidth ? getResponsive<MaxWidth>("max-width", getMaxWidth, props.maxWidth) : ""}
 `;

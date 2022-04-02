@@ -82,5 +82,4 @@ export const Code = styled.code<TypographyProps>`
     margin: 0;
     line-height: calc(${token("typography-fontSize")} * 1.5);
     font-size: calc(${token("typography-fontSize")} * 0.875);
-    /* background-color: ${(props) => props.theme.palette.background.darker}; */
 `;
