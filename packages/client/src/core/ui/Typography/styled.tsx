@@ -1,115 +1,86 @@
 import styled from "styled-components/macro";
+import { token } from "virtual:theme";
 
 interface TypographyProps {
     alternative?: boolean;
 }
 
-interface TextProps extends TypographyProps {
-    secondary?: boolean;
-}
-
 export const Heading1 = styled.h1<TypographyProps>`
-    font-family: ${(props) => props.theme.typography.fontFamily};
-    /* font-family: ${(props) => `var(${props.theme.typography.fontFamily})`}; */
+    font-family: ${token("typography-fontFamily")};
     color: ${(props) =>
-        props.alternative ? props.theme.palette.background.main : props.theme.palette.text.main};
+        props.alternative ? token("color-text-onBold") : token("color-text-highEmphasis")};
     font-weight: 300;
     margin: 0;
-    /* margin-bottom: 0.35em; */
-    font-size: ${(props) => `${props.theme.typography.fontSize * 3.75}px`};
-    /* font-size: ${(props) => `calc(var(${props.theme.typography.fontSize}) * 3.75)`}; */
+    font-size: calc(${token("typography-fontSize")} * 3.75);
 `;
 
 export const Heading2 = styled.h2<TypographyProps>`
-    font-family: ${(props) => props.theme.typography.fontFamily};
-    /* font-family: ${(props) => `var(${props.theme.typography.fontFamily})`}; */
+    font-family: ${token("typography-fontFamily")};
     color: ${(props) =>
-        props.alternative ? props.theme.palette.background.main : props.theme.palette.text.main};
+        props.alternative ? token("color-text-onBold") : token("color-text-highEmphasis")};
     font-weight: 300;
     margin: 0;
-    /* margin-bottom: 0.35em; */
-    font-size: ${(props) => `${props.theme.typography.fontSize * 2.5}px`};
-    /* font-size: ${(props) => `calc(var(${props.theme.typography.fontSize}) * 2.5)`}; */
+    font-size: calc(${token("typography-fontSize")} * 2.5);
 `;
 
 export const Heading3 = styled.h3<TypographyProps>`
-    font-family: ${(props) => props.theme.typography.fontFamily};
-    /* font-family: ${(props) => `var(${props.theme.typography.fontFamily})`}; */
+    font-family: ${token("typography-fontFamily")};
     color: ${(props) =>
-        props.alternative ? props.theme.palette.background.main : props.theme.palette.text.main};
+        props.alternative ? token("color-text-onBold") : token("color-text-highEmphasis")};
     font-weight: 400;
     margin: 0;
-    /* margin-bottom: 0.35em; */
-    font-size: ${(props) => `${props.theme.typography.fontSize * 2.125}px`};
-    /* font-size: ${(props) => `calc(var(${props.theme.typography.fontSize}) * 2.125)`}; */
+    font-size: calc(${token("typography-fontSize")} * 2.125);
 `;
 
 export const Heading4 = styled.h4<TypographyProps>`
-    font-family: ${(props) => props.theme.typography.fontFamily};
-    /* font-family: ${(props) => `var(${props.theme.typography.fontFamily})`}; */
+    font-family: ${token("typography-fontFamily")};
     color: ${(props) =>
-        props.alternative ? props.theme.palette.background.main : props.theme.palette.text.main};
-    font-weight: ${(props) => props.theme.typography.fontWeight};
+        props.alternative ? token("color-text-onBold") : token("color-text-highEmphasis")};
+    font-weight: 400;
     margin: 0;
-    /* margin-bottom: 0.35em; */
-    font-size: ${(props) => `${props.theme.typography.fontSize * 1.5}px`};
-    /* font-size: ${(props) => `calc(var(${props.theme.typography.fontSize}) * 1.5)`}; */
+    font-size: calc(${token("typography-fontSize")} * 1.5);
 `;
 
 export const Heading5 = styled.h5<TypographyProps>`
-    font-family: ${(props) => props.theme.typography.fontFamily};
-    /* font-family: ${(props) => `var(${props.theme.typography.fontFamily})`}; */
+    font-family: ${token("typography-fontFamily")};
     color: ${(props) =>
-        props.alternative ? props.theme.palette.background.main : props.theme.palette.text.main};
+        props.alternative ? token("color-text-onBold") : token("color-text-highEmphasis")};
     font-weight: 400;
     margin: 0;
-    /* margin-bottom: 0.35em; */
-    font-size: ${(props) => `${props.theme.typography.fontSize * 1.25}px`};
-    /* font-size: ${(props) => `calc(var(${props.theme.typography.fontSize}) * 1.25)`}; */
+    font-size: calc(${token("typography-fontSize")} * 1.25);
 `;
 
 export const Heading6 = styled.h6<TypographyProps>`
-    font-family: ${(props) => props.theme.typography.fontFamily};
-    /* font-family: ${(props) => `var(${props.theme.typography.fontFamily})`}; */
+    font-family: ${token("typography-fontFamily")};
     color: ${(props) =>
-        props.alternative ? props.theme.palette.background.main : props.theme.palette.text.main};
+        props.alternative ? token("color-text-onBold") : token("color-text-highEmphasis")};
     font-weight: 500;
     margin: 0;
-    /* margin-bottom: 0.35em; */
-    font-size: ${(props) => `${props.theme.typography.fontSize}px`};
-    /* font-size: ${(props) => `var(${props.theme.typography.fontSize})`}; */
+    font-size: ${token("typography-fontSize")};
 `;
 
-export const Text = styled.p<TextProps>`
-    font-family: ${(props) => props.theme.typography.fontFamily};
-    /* font-family: ${(props) => `var(${props.theme.typography.fontFamily})`}; */
-    color: ${(props) => {
-        const weight = props.secondary ? "lighter" : "main";
-        return props.alternative
-            ? props.theme.palette.background[weight]
-            : props.theme.palette.text[weight];
-    }};
+export const Text = styled.p<TypographyProps>`
+    font-family: ${token("typography-fontFamily")};
+    color: ${(props) =>
+        props.alternative ? token("color-text-onBold") : token("color-text-mediumEmphasis")};
     font-weight: 400;
     margin: 0;
-    line-height: ${(props) => `${props.theme.typography.fontSize * 1.5}px`};
-    /* margin-bottom: 0.35em; */
-    font-size: ${(props) => `${props.theme.typography.fontSize}px`};
-    /* font-size: ${(props) => `${props.theme.typography.fontSize}px`}; */
+    line-height: calc(${token("typography-fontSize")} * 1.5);
+    font-size: ${token("typography-fontSize")};
 `;
 
-export const Code = styled.code<TextProps>`
+export const SecondaryText = styled(Text)`
+    color: ${(props) =>
+        props.alternative ? token("color-text-onBold") : token("color-text-lowEmphasis")};
+`;
+
+export const Code = styled.code<TypographyProps>`
     font-family: Menlo, Monaco, Consolas, Courier New, monospace;
-    color: ${(props) => {
-        const weight = props.secondary ? "lighter" : "main";
-        return props.alternative
-            ? props.theme.palette.background[weight]
-            : props.theme.palette.text[weight];
-    }};
+    color: ${(props) =>
+        props.alternative ? token("color-text-onBold") : token("color-text-mediumEmphasis")};
     font-weight: 400;
     margin: 0;
-    line-height: ${(props) => `${props.theme.typography.fontSize * 1.5}px`};
-    /* margin-bottom: 0.35em; */
-    font-size: ${(props) => `${props.theme.typography.fontSize * 0.875}px`};
-    /* font-size: ${(props) => `${props.theme.typography.fontSize}px`}; */
-    background-color: ${(props) => props.theme.palette.background.darker};
+    line-height: calc(${token("typography-fontSize")} * 1.5);
+    font-size: calc(${token("typography-fontSize")} * 0.875);
+    /* background-color: ${(props) => props.theme.palette.background.darker}; */
 `;

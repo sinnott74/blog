@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import { Card, Stack, Box } from "../../../core/ui/Layout";
 import { LazyImgur } from "../../../core/ui/LazyImage/LazyImgur";
-import { Heading3, Text } from "../../../core/ui/Typography/styled";
+import { Heading3, SecondaryText } from "../../../core/ui/Typography/styled";
 import { Link } from "../../../core/ui/Link/Link";
 import { Tags } from "../Tags";
 
@@ -26,7 +26,7 @@ export const BlogCard: FC<Props> = ({ id, title, date, imageurl, tags = [], onTa
                     <Link to={`/blog/${id}`} title={title} noDecorate>
                         <Heading3>{title}</Heading3>
                     </Link>
-                    <Text secondary>{date}</Text>
+                    <SecondaryText>{date}</SecondaryText>
                 </Stack>
                 <Tags tags={tags} onTagClick={onTagClick} />
             </Stack>

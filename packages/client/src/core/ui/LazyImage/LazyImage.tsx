@@ -2,7 +2,7 @@ import React, { FC, useState } from "react";
 import { Container, Placeholder, Initial, Lazy } from "./styled";
 import { useInView } from "react-intersection-observer";
 import { calculateRatio } from "./utils";
-import { Text } from "../Typography/styled";
+import { SecondaryText } from "../Typography/styled";
 import { Box } from "../Layout";
 
 interface LazyImageProps {
@@ -61,7 +61,6 @@ export const LazyImage: FC<LazyImageProps> = ({
                         src={initialSrc}
                         alt={alt}
                         title={title}
-                        animate={initial}
                         onLoad={handleInitialLoaded}
                         onAnimationEnd={handleInitialImageFadeInEnd}
                     />
@@ -79,7 +78,7 @@ export const LazyImage: FC<LazyImageProps> = ({
             </Container>
             {caption && (
                 <Box align="center">
-                    <Text secondary>{title}</Text>
+                    <SecondaryText>{title}</SecondaryText>
                 </Box>
             )}
         </>

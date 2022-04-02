@@ -1,8 +1,9 @@
 import React, { FC } from "react";
 import { useColorScheme } from "../../services/colorScheme";
-import { Box, Card } from "../Layout";
+import { Box } from "../Layout";
 import { Code as CodeText } from "../Typography/Typography";
 import styled from "styled-components/macro";
+import { token } from "virtual:theme";
 
 interface Props {
     className?: string;
@@ -122,21 +123,30 @@ const DarkThemeCode = styled(CodeText)`
     }
 `;
 
+const StyledCodeBox = styled(Box)`
+    background-color: ${token("color-background-subtleNeutral-resting")};
+    border-left: calc(${token("spacing")} / 2) solid ${token("color-background-boldBrand-resting")};
+`;
+
 export const BlockCode: FC<Props> = ({ children, className }) => {
     const { isDarkMode } = useColorScheme();
     const ThemeCode = isDarkMode ? DarkThemeCode : LightThemeCode;
 
     return (
-        <Card forwardedAs="pre" accent background="darker" className={className}>
+        <StyledCodeBox forwardedAs="pre" className={className}>
             <ThemeCode>{children}</ThemeCode>
-        </Card>
+        </StyledCodeBox>
     );
 };
 
+const StyledInlineCodebox = styled(Box)`
+    background-color: ${token("color-background-subtleNeutral-resting")};
+`;
+
 export const InlineCode: FC<Props> = (props) => (
-    <Box component="span" display="inline" spacing="xxsmall" background="darker" {...props}>
+    <StyledInlineCodebox component="span" display="inline" spacing="xxsmall" {...props}>
         <CodeText {...props} />
-    </Box>
+    </StyledInlineCodebox>
 );
 
 export const Code: FC<Props> = ({ children, className }) => {

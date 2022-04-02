@@ -1,45 +1,33 @@
 import styled from "styled-components/macro";
 import { Cancel } from "../Icons";
 import { Text } from "../Typography/Typography";
+import { token } from "virtual:theme";
 
 export const Container = styled.button`
-    background: ${(props) => props.theme.palette.background.main};
+    background: ${token("color-background-subtleNeutral-resting")};
     border: 0;
     border-radius: 1rem;
-    padding: ${(props) => props.theme.spacing / 2 + "px"};
-    transition-duration: 0.15s;
-    transition-property: box-shadow, background;
+    padding: calc(${token("spacing")} / 2);
     outline-style: none;
     &:hover {
-        background: ${(props) => props.theme.palette.text.lighter};
+        background: ${token("color-background-subtleNeutral-hover")};
     }
     &:active {
-        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12),
-            0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        background: ${token("color-background-subtleNeutral-pressed")};
     }
 `;
 
 export const Label = styled(Text)`
     display: inline-block;
-    color: ${(props) => props.theme.palette.text.main};
-    transition-duration: 0.15s;
-    transition-property: color;
+    color: ${token("color-text-mediumEmphasis")};
     min-height: 1.5rem;
     line-height: 1.5rem;
-    padding: ${(props) => `0 ${props.theme.spacing}px`};
+    padding: 0 ${token("spacing")};
     margin: 0;
-    ${Container}:hover & {
-        color: ${(props) => props.theme.palette.background.lighter};
-    }
 `;
 
 export const Close = styled(Cancel)`
     display: block;
     cursor: pointer;
-    transition-duration: 0.15s;
-    transition-property: fill;
-    fill: ${(props) => props.theme.palette.text.main};
-    ${Container}:hover & {
-        fill: ${(props) => props.theme.palette.background.lighter};
-    }
+    fill: ${token("color-text-mediumEmphasis")};
 `;

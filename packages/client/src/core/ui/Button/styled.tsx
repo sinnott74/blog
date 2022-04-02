@@ -1,5 +1,5 @@
 import styled, { DefaultTheme, keyframes, css } from "styled-components/macro";
-import { Palette } from "../../theme/theme";
+import { token } from "virtual:theme";
 
 export interface ButtonBaseProps {
     primary?: boolean;
@@ -19,7 +19,7 @@ interface States {
     hover?: boolean;
 }
 
-const getPaletteName = ({ primary, secondary, warning }: ButtonBaseProps): keyof Palette => {
+const getPaletteName = ({ primary, secondary, warning }: ButtonBaseProps) => {
     if (warning) {
         return "warning";
     }
@@ -40,26 +40,58 @@ const getBaseBackgroundColor = ({
     textButton,
     outlined,
     icon,
-    theme,
     hover,
-}: ButtonBaseProps & { theme: DefaultTheme } & States) => {
+}: ButtonBaseProps & States) => {
     if (disabled) {
         if (textButton || outlined || icon) {
             return "transparent";
         }
-        return theme.palette.grey.lighter;
+        return token("color-background-disabled");
     }
     const palette = getPaletteName({ primary, secondary, warning });
     if (textButton || outlined || icon) {
-        if (hover) {
-            return theme.palette[palette].lighter;
+        if (!hover) {
+            return "transparent";
         }
-        return "transparent";
+        switch (palette) {
+            case "primary":
+                return token("color-background-subtleBrand-resting");
+            case "secondary":
+                return token("color-background-subtleBrand-resting");
+            case "warning":
+                return token("color-background-subtleWarning-resting");
+            case "grey":
+                return token("color-background-subtleNeutral-resting");
+            default:
+                return token("color-background-subtleBrand-resting");
+        }
     }
     if (hover) {
-        return theme.palette[palette].darker;
+        switch (palette) {
+            case "primary":
+                return token("color-background-subtleBrand-hover");
+            case "secondary":
+                return token("color-background-subtleBrand-hover");
+            case "warning":
+                return token("color-background-subtleWarning-hover");
+            case "grey":
+                return token("color-background-subtleNeutral-hover");
+            default:
+                return token("color-background-subtleBrand-hover");
+        }
     }
-    return theme.palette[palette].main;
+    switch (palette) {
+        case "primary":
+            return token("color-background-subtleBrand-resting");
+        case "secondary":
+            return token("color-background-subtleBrand-resting");
+        case "warning":
+            return token("color-background-subtleWarning-resting");
+        case "grey":
+            return token("color-background-subtleNeutral-resting");
+        default:
+            return token("color-background-subtleBrand-resting");
+    }
 };
 
 const getBaseTextColor = ({
@@ -70,19 +102,28 @@ const getBaseTextColor = ({
     outlined,
     textButton,
     icon,
-    theme,
-}: ButtonBaseProps & { theme: DefaultTheme }) => {
+}: ButtonBaseProps) => {
     if (disabled) {
-        return theme.palette.grey.main;
+        return token("color-text-lowEmphasis");
     }
     if (!textButton && !outlined && !icon) {
-        return theme.palette.background.lighter;
+        return token("color-text-mediumEmphasis");
     }
     const palette = getPaletteName({ primary, secondary, warning });
-    return palette === "grey" ? theme.palette.text.main : theme.palette[palette].main;
+    switch (palette) {
+        case "primary":
+            return token("color-text-brand");
+        case "secondary":
+            return token("color-text-brand");
+        case "warning":
+            return token("color-text-warning");
+        case "grey":
+        default:
+            return token("color-text-lowEmphasis");
+    }
 };
 
-const getPadding = ({ small, large, icon }: ButtonBaseProps & { theme: DefaultTheme }) => {
+const getPadding = ({ small, large, icon }: ButtonBaseProps) => {
     if (icon) {
         return "0.75rem";
     }
@@ -126,23 +167,23 @@ export const ButtonBase = styled.button.attrs(() => ({
     transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
         box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
         border 250ms cubic-bezier(0.4, 0, 0.2, s 1) 0ms;
-    box-shadow: ${(props) => (shouldDisableShadow(props) ? "" : props.theme.shadow.z1)};
+    box-shadow: ${(props) => (shouldDisableShadow(props) ? "" : token("shadow-resting"))};
     font-weight: 500;
     line-height: 1.5;
     border-radius: ${(props) => (props.icon ? "50%" : "4px")};
     letter-spacing: 0.02857em;
     text-transform: uppercase;
-    font-family: ${(props) => props.theme.typography.fontFamily};
+    font-family: ${token("typography-fontFamily")};
     color: ${(props) => getBaseTextColor(props)};
     fill: ${(props) => getBaseTextColor(props)};
     background: ${(props) => getBaseBackgroundColor(props)};
     &:hover {
         background: ${(props) => getBaseBackgroundColor({ ...props, hover: true })};
-        box-shadow: ${(props) => (shouldDisableShadow(props) ? "" : props.theme.shadow.z2)};
+        box-shadow: ${(props) => (shouldDisableShadow(props) ? "" : token("shadow-hover"))};
+        color: ${(props) => getBaseTextColor(props)};
     }
     &:active {
-        box-shadow: ${(props) => (shouldDisableShadow(props) ? "" : props.theme.shadow.z0)};
-        /* box-shadow: none; */
+        box-shadow: ${(props) => (shouldDisableShadow(props) ? "" : token("shadow-pressed"))};
     }
 `;
 
