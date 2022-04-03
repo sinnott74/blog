@@ -1,4 +1,4 @@
-import styled, { keyframes } from "styled-components/macro";
+import { styled, keyframes } from "@compiled/react";
 import { token } from "virtual:theme";
 
 const rotate = keyframes`

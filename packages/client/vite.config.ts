@@ -8,7 +8,7 @@ const testPlugins = process.env.NODE_ENV !== "test" ? [reactRefresh()] : [];
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => {
-    const { metadata, routes, mdx: mdxPromise, theme } = await import("./src/plugins");
+    const { metadata, routes, mdx: mdxPromise, theme, compiledCSS } = await import("./src/plugins");
     const mdx = await mdxPromise();
     return {
         build: {
@@ -18,6 +18,15 @@ export default defineConfig(async () => {
             },
         },
         base: process.env.VITE_BASE_URL || "/",
-        plugins: [theme(), routes(), metadata(), ...testPlugins, svgr(), mdx(), macrosPlugin()],
+        plugins: [
+            theme(),
+            compiledCSS(),
+            routes(),
+            metadata(),
+            ...testPlugins,
+            svgr(),
+            mdx(),
+            macrosPlugin(),
+        ],
     };
 });

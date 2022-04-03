@@ -23,7 +23,7 @@ export const Button: FC<ButtonProps> = ({
     disabled,
     outlined,
     size,
-    type,
+    appearance,
     palette,
     selected,
 }) => {
@@ -56,7 +56,7 @@ export const Button: FC<ButtonProps> = ({
             outlined={outlined}
             size={size}
             palette={palette}
-            type={type}
+            appearance={appearance}
             selected={selected}
             onClick={handleClick}
         >

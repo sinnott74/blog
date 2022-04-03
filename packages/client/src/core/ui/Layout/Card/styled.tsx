@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components/macro";
+import { styled } from "@compiled/react";
 import { token } from "virtual:theme";
 import { Box, Props as BoxProps } from "../Box/Box";
 

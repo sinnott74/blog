@@ -1,4 +1,4 @@
-import styled from "styled-components/macro";
+import { styled } from "@compiled/react";
 import { Cancel } from "../Icons";
 import { Text } from "../Typography/Typography";
 import { token } from "virtual:theme";

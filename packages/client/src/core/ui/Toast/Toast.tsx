@@ -13,7 +13,7 @@ interface ToastProps {
 export const Toast: FC<ToastProps> = ({ showing, message, onClose }) => (
     <Container animate={showing}>
         <Heading3 alternative>{message}</Heading3>
-        <Button type="icon" onClick={onClose}>
+        <Button appearance="icon" onClick={onClose}>
             <Close />
         </Button>
     </Container>

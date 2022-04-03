@@ -1,12 +1,12 @@
-import styled, { keyframes, css } from "styled-components/macro";
+import { styled, keyframes, css } from "@compiled/react";
 import { token } from "virtual:theme";
 
-type Type = "default" | "text" | "icon";
+type Appearance = "default" | "text" | "icon";
 type Palette = "default" | "primary" | "warning";
 type Size = "small" | "medium" | "large";
 
 export interface ButtonBaseProps {
-    type?: Type;
+    appearance?: Appearance;
     palette?: Palette;
     size?: Size;
     disableElevation?: boolean;
@@ -15,8 +15,8 @@ export interface ButtonBaseProps {
     selected?: boolean;
 }
 
-const getBackgroundColor = ({ disabled, type, palette, selected }: ButtonBaseProps) => {
-    if (type === "text" || (type === "icon" && !selected)) {
+const getBackgroundColor = ({ disabled, appearance, palette, selected }: ButtonBaseProps) => {
+    if (appearance === "text" || (appearance === "icon" && !selected)) {
         return "transparent";
     }
 
@@ -35,8 +35,8 @@ const getBackgroundColor = ({ disabled, type, palette, selected }: ButtonBasePro
     }
 };
 
-const getHoverBackgroundColor = ({ disabled, type, palette }: ButtonBaseProps) => {
-    if (type === "text") {
+const getHoverBackgroundColor = ({ disabled, appearance, palette }: ButtonBaseProps) => {
+    if (appearance === "text") {
         return "transparent";
     }
     if (disabled) {
@@ -53,8 +53,8 @@ const getHoverBackgroundColor = ({ disabled, type, palette }: ButtonBaseProps) =
     }
 };
 
-const getPressedBackgroundColor = ({ disabled, type, palette }: ButtonBaseProps) => {
-    if (type === "text") {
+const getPressedBackgroundColor = ({ disabled, appearance, palette }: ButtonBaseProps) => {
+    if (appearance === "text") {
         return "transparent";
     }
     if (disabled) {
@@ -87,8 +87,8 @@ const getBaseTextColor = ({ palette, disabled }: ButtonBaseProps) => {
     }
 };
 
-const getPadding = ({ type, size }: ButtonBaseProps) => {
-    if (type === "icon") {
+const getPadding = ({ appearance, size }: ButtonBaseProps) => {
+    if (appearance === "icon") {
         return "0.75rem";
     }
     switch (size) {
@@ -102,26 +102,65 @@ const getPadding = ({ type, size }: ButtonBaseProps) => {
     }
 };
 
-const shouldDisableShadow = ({ disableElevation, disabled, type }: ButtonBaseProps) => {
-    return disableElevation || disabled || type === "text" || type === "icon";
+const shouldDisableShadow = ({ disableElevation, disabled, appearance }: ButtonBaseProps) => {
+    return disableElevation || disabled || appearance === "text" || appearance === "icon";
 };
 
-const isIcon = ({ type }: ButtonBaseProps) => type === "icon";
+const isIcon = ({ appearance }: ButtonBaseProps) => appearance === "icon";
 
-export const ButtonBase = styled.button.attrs(() => ({
-    tabIndex: "0",
-}))<ButtonBaseProps>`
+// export const ButtonBase = styled.button.attrs(() => ({
+//     tabIndex: "0",
+// }))<ButtonBaseProps>`
+// export const ButtonBase = styled.button<ButtonBaseProps>`
+//     display: inline-flex;
+//     position: relative;
+//     overflow: hidden;
+//     align-items: center;
+//     border: ${(props) => (props.outlined ? `1px solid ${getBaseTextColor(props)}` : "0")};
+//     outline: 0;
+//     cursor: ${(props) => (props.disabled ? "" : "pointer")};
+//     user-select: none;
+//     justify-content: center;
+//     text-decoration: none;
+//     padding: ${(props) => getPadding(props)};
+//     font-size: 0.875rem;
+//     min-width: ${(props) => (isIcon(props) ? "" : "4rem")};
+//     width: ${(props) => (isIcon(props) ? "3rem" : "")};
+//     box-sizing: border-box;
+//     transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+//         box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+//         border 250ms cubic-bezier(0.4, 0, 0.2, s 1) 0ms;
+//     box-shadow: ${(props) => (shouldDisableShadow(props) ? "" : token("shadow-resting"))};
+//     font-weight: 500;
+//     line-height: 1.5;
+//     border-radius: ${(props) => (isIcon(props) ? "50%" : "4px")};
+//     letter-spacing: 0.02857em;
+//     text-transform: uppercase;
+//     font-family: ${token("typography-fontFamily")};
+//     color: ${(props) => getBaseTextColor(props)};
+//     fill: ${(props) => getBaseTextColor(props)};
+//     background: ${(props) => getBackgroundColor(props)};
+//     &:hover {
+//         background: ${(props) => getHoverBackgroundColor(props)};
+//         box-shadow: ${(props) => (shouldDisableShadow(props) ? "" : token("shadow-hover"))};
+//         color: ${(props) => getBaseTextColor(props)};
+//     }
+//     &:active {
+//         background: ${(props) => getPressedBackgroundColor(props)};
+//         box-shadow: ${(props) => (shouldDisableShadow(props) ? "" : token("shadow-pressed"))};
+//     }
+// `;
+
+export const ButtonBase = styled.button<ButtonBaseProps>`
     display: inline-flex;
     position: relative;
     overflow: hidden;
     align-items: center;
-    border: ${(props) => (props.outlined ? `1px solid ${getBaseTextColor(props)}` : "0")};
     outline: 0;
     cursor: ${(props) => (props.disabled ? "" : "pointer")};
     user-select: none;
     justify-content: center;
     text-decoration: none;
-    padding: ${(props) => getPadding(props)};
     font-size: 0.875rem;
     min-width: ${(props) => (isIcon(props) ? "" : "4rem")};
     width: ${(props) => (isIcon(props) ? "3rem" : "")};
@@ -136,17 +175,9 @@ export const ButtonBase = styled.button.attrs(() => ({
     letter-spacing: 0.02857em;
     text-transform: uppercase;
     font-family: ${token("typography-fontFamily")};
-    color: ${(props) => getBaseTextColor(props)};
-    fill: ${(props) => getBaseTextColor(props)};
-    background: ${(props) => getBackgroundColor(props)};
     &:hover {
-        background: ${(props) => getHoverBackgroundColor(props)};
-        box-shadow: ${(props) => (shouldDisableShadow(props) ? "" : token("shadow-hover"))};
-        color: ${(props) => getBaseTextColor(props)};
     }
     &:active {
-        background: ${(props) => getPressedBackgroundColor(props)};
-        box-shadow: ${(props) => (shouldDisableShadow(props) ? "" : token("shadow-pressed"))};
     }
 `;
 
@@ -176,12 +207,13 @@ interface Origin {
     y: number;
 }
 
-export const Ripple = styled.span.attrs(({ x, y }: Origin) => ({
-    style: {
-        left: `${x}px`,
-        top: `${y}px`,
-    },
-}))<Animatable & Origin>`
+// export const Ripple = styled.span.attrs(({ x, y }: Origin) => ({
+//     style: {
+//         left: `${x}px`,
+//         top: `${y}px`,
+//     },
+// }))<Animatable & Origin>`
+export const Ripple = styled.span<Animatable & Origin>`
     position: absolute;
     border-radius: 50%;
     background-color: rgba(0, 0, 0, 0.3);

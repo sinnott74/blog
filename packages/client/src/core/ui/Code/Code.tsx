@@ -2,7 +2,7 @@ import React, { FC } from "react";
 import { useColorScheme } from "../../services/colorScheme";
 import { Box } from "../Layout";
 import { Code as CodeText } from "../Typography/Typography";
-import styled from "styled-components/macro";
+import { styled } from "@compiled/react";
 import { token } from "virtual:theme";
 
 interface Props {

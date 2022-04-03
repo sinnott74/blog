@@ -29,7 +29,7 @@ export const Default = () => (
         <h2>Disable Elevation</h2>
         <Buttons disableElevation />
         <h2>Text Button</h2>
-        <Buttons type="text" />
+        <Buttons appearance="text" />
         <h2>Outlined</h2>
         <Buttons outlined />
         <h2>Sizes</h2>
@@ -37,7 +37,7 @@ export const Default = () => (
         <Buttons size="medium" />
         <Buttons size="large" />
         <h2>Icon</h2>
-        <Buttons type="icon">
+        <Buttons appearance="icon">
             <AddAlert />
         </Buttons>
     </Stack>

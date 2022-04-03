@@ -1,4 +1,4 @@
-import styled from "styled-components/macro";
+import { styled } from "@compiled/react";
 import { token } from "virtual:theme";
 
 interface TypographyProps {
@@ -69,7 +69,7 @@ export const Text = styled.p<TypographyProps>`
     font-size: ${token("typography-fontSize")};
 `;
 
-export const SecondaryText = styled(Text)`
+export const SecondaryText = styled(Text)<TypographyProps>`
     color: ${(props) =>
         props.alternative ? token("color-text-onBold") : token("color-text-lowEmphasis")};
 `;

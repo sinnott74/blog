@@ -1,4 +1,4 @@
-import styled from "styled-components/macro";
+import { styled } from "@compiled/react";
 import background from "../../images/bg-shapes.svg";
 import { token } from "virtual:theme";
 
@@ -6,7 +6,7 @@ const kHeaderHeight = "56px";
 
 export const Header = styled.div`
     background: url(${background}), linear-gradient(90deg, #2d74da, #12a3b4);
-    height: ${kHeaderHeight};
+    height: 56px;
     position: fixed;
     top: 0;
     left: 0;
@@ -37,6 +37,6 @@ export const LeftSectionContainer = styled.div`
 
 export const Main = styled.div`
     display: flex;
-    min-height: calc(100% - ${kHeaderHeight});
-    margin-top: ${kHeaderHeight};
+    min-height: calc(100% - 56px);
+    margin-top: 56px;
 `;

@@ -1,4 +1,4 @@
-import styled, { css, keyframes } from "styled-components/macro";
+import { styled, css, keyframes } from "@compiled/react";
 import { token } from "virtual:theme";
 import { ReactComponent as PlaceholderSVG } from "./placeholder.svg";
 
@@ -43,18 +43,51 @@ export const Container = styled.div<ContainerProps>`
 `;
 
 export const Placeholder = styled(PlaceholderSVG)<Animatable>`
-    ${common}
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    top: 0;
+    left: 0;
+    position: absolute;
+    animation: ${(props) =>
+        props.animate
+            ? css`
+                  ${kFadeTime} ${fadeIn}
+              `
+            : ""};
     animation-fill-mode: backwards;
     fill: ${token("color-background-subtleNeutral-resting")};
 `;
 
 export const Initial = styled.img<Animatable>`
-    ${common}
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    top: 0;
+    left: 0;
+    position: absolute;
+    animation: ${(props) =>
+        props.animate
+            ? css`
+                  ${kFadeTime} ${fadeIn}
+              `
+            : ""};
     animation-fill-mode: backwards;
 `;
 
 export const Lazy = styled.img<Animatable>`
-    ${common}
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    top: 0;
+    left: 0;
+    position: absolute;
+    animation: ${(props) =>
+        props.animate
+            ? css`
+                  ${kFadeTime} ${fadeIn}
+              `
+            : ""};
     opacity: 0;
     animation-fill-mode: forwards;
 `;
