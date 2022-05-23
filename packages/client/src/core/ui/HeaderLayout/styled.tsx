@@ -1,4 +1,4 @@
-import styled from "styled-components/macro";
+import { styled } from "@compiled/react";
 import background from "../../images/bg-shapes.svg";
 import { token } from "virtual:theme";
 

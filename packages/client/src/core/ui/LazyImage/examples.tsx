@@ -52,7 +52,7 @@ export const Default = () => {
                 initialSrc="https://i.imgur.com/ZVaDnJxt.png"
                 title="Lazy Image"
                 alt="Image with react icon"
-                heightToWidthRatio={1.5}
+                widthToHeightRatio={1.5}
             />
         </>
         // </div>

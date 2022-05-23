@@ -1,5 +1,6 @@
-import styled, { keyframes, css } from "styled-components/macro";
+import styled from "styled-components/macro";
 import { token } from "virtual:theme";
+import { styled as compiledStyled, keyframes as compiledKeyframes } from "@compiled/react";
 
 type Type = "default" | "text" | "icon";
 type Palette = "default" | "primary" | "warning";
@@ -150,49 +151,31 @@ export const ButtonBase = styled.button.attrs(() => ({
     }
 `;
 
-export const Label = styled.span`
-    width: 100%;
-    display: inherit;
-    align-items: inherit;
-    justify-content: inherit;
-`;
-
-const ripple = keyframes`
+const rippleOpacity = compiledKeyframes`
   from {
     opacity: 1;
-    transform: scale(0);
   }
   to {
     opacity: 0;
+  }
+`;
+
+const rippleScale = compiledKeyframes`
+  from {
+    transform: scale(0);
+  }
+  to {
     transform: scale(20);
   }
 `;
 
-interface Animatable {
-    animate?: boolean;
-}
-interface Origin {
-    x: number;
-    y: number;
-}
-
-export const Ripple = styled.span.attrs(({ x, y }: Origin) => ({
-    style: {
-        left: `${x}px`,
-        top: `${y}px`,
-    },
-}))<Animatable & Origin>`
+export const Ripple = compiledStyled.span`
     position: absolute;
     border-radius: 50%;
     background-color: rgba(0, 0, 0, 0.3);
     pointer-events: none;
     width: 10px;
     height: 10px;
-    animation: ${({ animate }) =>
-        animate
-            ? css`
-                  ${ripple} 0.5s
-              `
-            : ""};
+    animation: ${rippleOpacity} 0.5s, ${rippleScale} 0.5s;
     opacity: 0;
 `;

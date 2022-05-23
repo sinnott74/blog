@@ -9,20 +9,18 @@ interface Props {
     onTagClick?: (tag: string) => void;
     closeable?: boolean;
 }
-export const Tags: FC<Props> = ({ tags, onTagClick, align, closeable }) => {
-    return (
-        <Inline spacing="xxsmall" align={align}>
-            {tags.filter(Boolean).map((tag) => (
-                <Chip
-                    key={tag}
-                    onClick={() => {
-                        onTagClick && onTagClick(tag);
-                    }}
-                    closeable={closeable}
-                >
-                    {tag}
-                </Chip>
-            ))}
-        </Inline>
-    );
-};
+export const Tags: FC<Props> = ({ tags, onTagClick, align, closeable }) => (
+    <Inline spacing="xxsmall" align={align}>
+        {tags.filter(Boolean).map((tag) => (
+            <Chip
+                key={tag}
+                onClick={() => {
+                    onTagClick && onTagClick(tag);
+                }}
+                closeable={closeable}
+            >
+                {tag}
+            </Chip>
+        ))}
+    </Inline>
+);

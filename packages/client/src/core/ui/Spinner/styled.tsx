@@ -1,4 +1,4 @@
-import styled, { keyframes } from "styled-components/macro";
+import { styled, keyframes } from "@compiled/react";
 import { token } from "virtual:theme";
 
 const rotate = keyframes`
@@ -7,25 +7,7 @@ const rotate = keyframes`
   }
 
   to {
-    transform: rotate(450deg);
-  }
-`;
-
-const line = keyframes`
-  0% {
-    stroke-dasharray: 2, 85.964;
-    transform: rotate(0);
-  }
-
-  50% {
-    stroke-dasharray: 65.973, 21.9911;
-    stroke-dashoffset: 0;
-  }
-
-  100% {
-    stroke-dasharray: 2, 85.964;
-    stroke-dashoffset: -65.973;
-    transform: rotate(90deg);
+    transform: rotate(360deg);
   }
 `;
 
@@ -41,5 +23,6 @@ export const Circle = styled.circle`
     stroke: ${token("color-background-boldBrand-resting")};
     stroke-width: 3px;
     transform-origin: 50%;
-    animation: ${line} 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite, ${rotate} 1.6s linear infinite;
+    stroke-dasharray: 66 100;
+    animation: ${rotate} 0.8s linear infinite;
 `;

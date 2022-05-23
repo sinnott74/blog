@@ -142,7 +142,7 @@ Docker builds images in layers. Each command creates a new layer on to of the ol
 for faster repeatable builds because we don't need to rebuild layers that haven't change. As such
 you should put the layers that are most likely to change last.
 
-```docker
+```dockerfile
 # Dockerfile
 FROM golang:1.11.1-alpine3.8 as builder
 ENV GO111MODULE on

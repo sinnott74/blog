@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 import { NavLink, NavLinkProps } from "react-router-dom";
-import styled from "styled-components/macro";
+import { styled } from "@compiled/react";
 
 type LinkRel = "nofollow" | "noopener" | "noreferrer";
 

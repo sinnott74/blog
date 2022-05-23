@@ -12,7 +12,7 @@ interface LazyImageProps {
     title: string;
     className?: string;
     onClick?: () => void;
-    heightToWidthRatio?: number;
+    widthToHeightRatio?: number;
     caption?: boolean;
 }
 
@@ -23,7 +23,7 @@ export const LazyImage: FC<LazyImageProps> = ({
     title,
     className,
     onClick,
-    heightToWidthRatio,
+    widthToHeightRatio,
     caption,
 }) => {
     const [ref, inView] = useInView({
@@ -50,7 +50,7 @@ export const LazyImage: FC<LazyImageProps> = ({
         setInitial(false);
     };
 
-    const ratio = calculateRatio({ heightToWidthRatio, src });
+    const ratio = calculateRatio({ widthToHeightRatio, src });
 
     return (
         <>
@@ -62,7 +62,7 @@ export const LazyImage: FC<LazyImageProps> = ({
                         alt={alt}
                         title={title}
                         onLoad={handleInitialLoaded}
-                        onAnimationEnd={handleInitialImageFadeInEnd}
+                        // onAnimationEnd={handleInitialImageFadeInEnd}
                     />
                 )}
                 {inView && (

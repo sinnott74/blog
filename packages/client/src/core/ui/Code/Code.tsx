@@ -2,124 +2,187 @@ import React, { FC } from "react";
 import { useColorScheme } from "../../services/colorScheme";
 import { Box } from "../Layout";
 import { Code as CodeText } from "../Typography/Typography";
-import styled from "styled-components/macro";
+import { styled } from "@compiled/react";
 import { token } from "virtual:theme";
 
 interface Props {
     className?: string;
     children: string;
 }
-// Based off themes in https://github.com/FormidableLabs/prism-react-renderer/tree/master/src/themes
+
+// Based off  highlight.js/styles/vs.css
 const LightThemeCode = styled(CodeText)`
-    & .comment {
-        color: rgb(0, 128, 0);
-    }
-    & .builtin {
-        color: rgb(0, 112, 193);
-    }
-    & .number,
-    & .variable,
-    & .inserted {
-        color: rgb(9, 134, 88);
-    }
-    & .operator {
-        color: rgb(0, 0, 0);
-    }
-    & .constant,
-    & .chars {
-        color: rgb(129, 31, 63);
-    }
-    & .tag {
-        color: rgb(128, 0, 0);
-    }
-    & .attr-name {
-        color: rgb(255, 0, 0);
-    }
-    & .deleted,
-    & .string {
-        color: rgb(163, 21, 21);
-    }
-    & .changed,
-    & .punctuation {
-        color: rgb(4, 81, 165);
-    }
-    & .function,
-    & .keyword {
-        color: rgb(0, 0, 255);
-    }
-    & .class-name {
-        color: rgb(38, 127, 153);
-    }
-`;
-
-const DarkThemeCode = styled(CodeText)`
-    & .prolog {
-        color: rgb(0, 0, 128);
+    .hljs {
+        display: block;
+        overflow-x: auto;
+        padding: 0.5em;
+        background: white;
+        color: black;
     }
 
-    & .comment {
-        color: rgb(106, 153, 85);
+    .hljs-comment,
+    .hljs-quote,
+    .hljs-variable {
+        color: #008000;
     }
 
-    & .builtin,
-    & .changed,
-    & .keyword,
-    & .interpolation-punctuation {
-        color: rgb(86, 156, 214);
+    .hljs-keyword,
+    .hljs-selector-tag,
+    .hljs-built_in,
+    .hljs-name,
+    .hljs-tag {
+        color: #00f;
     }
 
-    & .number,
-    & .inserted {
-        color: rgb(181, 206, 168);
+    .hljs-string,
+    .hljs-title,
+    .hljs-section,
+    .hljs-attribute,
+    .hljs-literal,
+    .hljs-template-tag,
+    .hljs-template-variable,
+    .hljs-type,
+    .hljs-addition {
+        color: #a31515;
     }
 
-    & .constant {
-        color: rgb(100, 102, 149);
+    .hljs-deletion,
+    .hljs-selector-attr,
+    .hljs-selector-pseudo,
+    .hljs-meta {
+        color: #2b91af;
     }
 
-    & .attr-name,
-    & .variable {
-        color: rgb(156, 220, 254);
-    }
-
-    & .deleted,
-    & .string,
-    & .attr-value,
-    & .template-punctuation {
-        color: rgb(206, 145, 120);
-    }
-
-    & .selector {
-        color: rgb(215, 186, 125);
-    }
-
-    & .tag {
-        color: rgb(78, 201, 176);
-    }
-
-    & .language-markup .tag {
-        color: rgb(86, 156, 214);
-    }
-
-    & .punctuation,
-    & .operator {
-        color: rgb(212, 212, 212);
-    }
-
-    & .language-markup .punctuation {
+    .hljs-doctag {
         color: #808080;
     }
 
-    & .function {
-        color: rgb(220, 220, 170);
+    .hljs-attr {
+        color: #f00;
     }
 
-    & .class-name {
-        color: rgb(78, 201, 176);
+    .hljs-symbol,
+    .hljs-bullet,
+    .hljs-link {
+        color: #00b0e8;
     }
 
-    & .char {
-        color: rgb(209, 105, 105);
+    .hljs-emphasis {
+        font-style: italic;
+    }
+
+    .hljs-strong {
+        font-weight: bold;
+    }
+`;
+
+// highlight.js/styles/vs2015.css
+const DarkThemeCode = styled(CodeText)`
+    .hljs {
+        display: block;
+        overflow-x: auto;
+        padding: 0.5em;
+        background: #1e1e1e;
+        color: #dcdcdc;
+    }
+
+    .hljs-keyword,
+    .hljs-literal,
+    .hljs-symbol,
+    .hljs-name {
+        color: #569cd6;
+    }
+    .hljs-link {
+        color: #569cd6;
+        text-decoration: underline;
+    }
+
+    .hljs-built_in,
+    .hljs-type {
+        color: #4ec9b0;
+    }
+
+    .hljs-number,
+    .hljs-class {
+        color: #b8d7a3;
+    }
+
+    .hljs-string,
+    .hljs-meta-string {
+        color: #d69d85;
+    }
+
+    .hljs-regexp,
+    .hljs-template-tag {
+        color: #9a5334;
+    }
+
+    .hljs-subst,
+    .hljs-function,
+    .hljs-title,
+    .hljs-params,
+    .hljs-formula {
+        color: #dcdcdc;
+    }
+
+    .hljs-comment,
+    .hljs-quote {
+        color: #57a64a;
+        font-style: italic;
+    }
+
+    .hljs-doctag {
+        color: #608b4e;
+    }
+
+    .hljs-meta,
+    .hljs-meta-keyword,
+    .hljs-tag {
+        color: #9b9b9b;
+    }
+
+    .hljs-variable,
+    .hljs-template-variable {
+        color: #bd63c5;
+    }
+
+    .hljs-attr,
+    .hljs-attribute,
+    .hljs-builtin-name {
+        color: #9cdcfe;
+    }
+
+    .hljs-section {
+        color: gold;
+    }
+
+    .hljs-emphasis {
+        font-style: italic;
+    }
+
+    .hljs-strong {
+        font-weight: bold;
+    }
+
+    .hljs-bullet,
+    .hljs-selector-tag,
+    .hljs-selector-id,
+    .hljs-selector-class,
+    .hljs-selector-attr,
+    .hljs-selector-pseudo {
+        color: #d7ba7d;
+    }
+
+    .hljs-addition {
+        background-color: #144212;
+        display: inline-block;
+        width: 100%;
+    }
+
+    .hljs-deletion {
+        background-color: #600;
+        display: inline-block;
+        width: 100%;
     }
 `;
 
@@ -129,29 +192,25 @@ const ThemedCode: FC<Props> = ({ children }) => {
     return <ThemeCode>{children}</ThemeCode>;
 };
 
-export const BlockCode: FC<Props> = ({ children, className }) => {
-    return (
-        <Box
-            component="pre"
-            className={className}
-            accent
-            background={token("color-background-subtleNeutral-resting")}
-        >
-            <ThemedCode>{children}</ThemedCode>
-        </Box>
-    );
-};
+const CodeBox = styled(Box)`
+    background: ${token("color-background-subtleNeutral-resting")};
+    border-left: calc(${token("spacing")} / 2) solid ${token("color-background-boldBrand-resting")};
+`;
+
+export const BlockCode: FC<Props> = ({ children, className }) => (
+    <CodeBox className={className} component="pre" display="flex">
+        <ThemedCode>{children}</ThemedCode>
+    </CodeBox>
+);
+
+const InlineCodeBox = styled(Box)`
+    background: ${token("color-background-subtleNeutral-resting")};
+`;
 
 export const InlineCode: FC<Props> = (props) => (
-    <Box
-        component="span"
-        display="inline"
-        spacing="xxsmall"
-        background={token("color-background-subtleNeutral-resting")}
-        {...props}
-    >
+    <InlineCodeBox component="span" display="inline" spacing="xxsmall">
         <CodeText {...props} />
-    </Box>
+    </InlineCodeBox>
 );
 
 export const Code: FC<Props> = ({ children, className }) => {

@@ -1,4 +1,4 @@
-import styled from "styled-components/macro";
+import { styled } from "@compiled/react";
 
 export const Container = styled.div``;
 

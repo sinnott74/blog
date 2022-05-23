@@ -1,11 +1,11 @@
-import styled from "styled-components/macro";
+import { styled } from "@compiled/react";
 import { Card } from "../Layout";
 
 interface Animatable {
     animate: boolean;
 }
 
-export const Container = styled(Card).attrs({ role: "alert" })<Animatable>`
+export const Container = styled(Card)<Animatable>`
     box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.67);
     padding: 4px 4px 4px 12px;
     transition: transform 130ms ease-in;

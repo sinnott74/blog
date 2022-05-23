@@ -13,11 +13,29 @@ export default {
         // "@storybook/addon-viewport",
     ],
     viteFinal: async (config: UserConfig) => {
-        const { metadata, routes, mdx: mdxPromise, theme } = await import("../src/plugins/");
+        const {
+            metadata,
+            routes,
+            mdx: mdxPromise,
+            theme,
+            compiledCSS,
+            box,
+        } = await import("../src/plugins/");
         const mdx = await mdxPromise();
         // mdx is already included in the plugins (at index 2). Removing it so we can configure it ourselves
         // https://github.com/eirslett/storybook-builder-vite/blob/main/packages/storybook-builder-vite/vite-config.js
-        config.plugins?.splice(2, 1, theme(), metadata(), routes(), svgr(), mdx(), macrosPlugin());
+        config.plugins?.splice(
+            2,
+            1,
+            box(),
+            theme(),
+            compiledCSS(),
+            metadata(),
+            routes(),
+            svgr(),
+            mdx(),
+            macrosPlugin(),
+        );
         return config;
     },
 };

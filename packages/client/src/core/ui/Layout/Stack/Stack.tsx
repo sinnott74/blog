@@ -1,32 +1,42 @@
-import React, { ReactNode } from "react";
-import { StackContainer, StackItem } from "./styled";
+import React, { FC } from "react";
 import { Alignable, Spacable } from "../util";
+import { Box, neg } from "virtual-box";
 
-export type Props = {
-    children?: ReactNode;
-} & Spacable &
-    Alignable;
+export type Props = Spacable & Alignable;
 
-export const Stack = React.forwardRef<HTMLDivElement, Props>(
-    ({ children, align, spacing }, ref) => {
-        const filteredChildren = React.Children.toArray(children).filter(Boolean);
+export const Stack: FC<Props> = ({ children, align, spacing = "small" }) => {
+    const filteredChildren = React.Children.toArray(children).filter(Boolean);
 
-        if (filteredChildren.length === 0) {
-            return null;
-        }
+    if (filteredChildren.length === 0) {
+        return null;
+    }
 
-        const wrappedChildren = filteredChildren.map((child, i) => (
-            <StackItem key={i} align={align} spacing={spacing}>
-                {child}
-            </StackItem>
-        ));
+    const wrappedChildren = filteredChildren.map((child, i) => (
+        <StackItem key={i} align={align} spacing={spacing}>
+            {child}
+        </StackItem>
+    ));
 
-        return (
-            <StackContainer ref={ref} spacing={spacing}>
-                {wrappedChildren}
-            </StackContainer>
-        );
-    },
+    return <StackContainer spacing={spacing}>{wrappedChildren}</StackContainer>;
+};
+
+export const StackContainer: FC<Spacable> = ({ spacing, children }) => (
+    <Box marginTop={neg(spacing)} maxWidth="full">
+        {children}
+    </Box>
 );
 
-export { StackItem, StackContainer };
+export const StackItem: FC<Alignable & Spacable> = ({ spacing, align, children }) => (
+    <Box
+        display="flex"
+        flexDirection="column"
+        paddingTop={spacing}
+        width="full"
+        alignItems={align}
+        // &:empty {
+        //         display: none;
+        //     }
+    >
+        {children}
+    </Box>
+);

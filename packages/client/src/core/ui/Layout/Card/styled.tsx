@@ -1,14 +1,16 @@
 import React from "react";
-import styled from "styled-components/macro";
+import { styled } from "@compiled/react";
 import { token } from "virtual:theme";
 import { Box, Props as BoxProps } from "../Box/Box";
+import { StyledProps } from "@compiled/react/dist/esm/styled";
 
-export type Props = BoxProps & { forwardedAs?: string | React.ComponentType<any> } & {
-    hover?: boolean;
-    rounded?: boolean;
-    raised?: boolean;
-    accent?: boolean;
-};
+export type Props = BoxProps &
+    StyledProps & {
+        hover?: boolean;
+        rounded?: boolean;
+        raised?: boolean;
+        accent?: boolean;
+    };
 
 export const InnerCard = styled(Box)<Props>`
     transition-duration: 0.15s;

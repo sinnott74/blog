@@ -1,5 +1,5 @@
-import React, { FC, useRef, useCallback } from "react";
-import { scrollTo } from "../../common/utils/scrollTo";
+import React, { FC, useCallback } from "react";
+import { scrollTop } from "../../common/utils/scrollTo";
 import { Button } from "../Button/Button";
 import { ChevronLeft, ChevronRight } from "../Icons";
 import { Inline, Stack, Tiles } from "../Layout";
@@ -19,14 +19,12 @@ export const Pagination: FC<PaginationProps> = ({
     onPageChange,
     renderItem,
 }) => {
-    const ref = useRef<HTMLDivElement>(null);
-
     const handlePageChange = useCallback(
         (newPage: number) => {
             if (newPage === page) {
                 return;
             }
-            scrollTo(ref && ref.current);
+            scrollTop();
             onPageChange(newPage);
         },
         [onPageChange, page],
@@ -40,7 +38,7 @@ export const Pagination: FC<PaginationProps> = ({
         .filter(Boolean);
 
     return (
-        <Stack ref={ref}>
+        <Stack>
             <Tiles columns={columns}>{items}</Tiles>
             <PaginationSelector
                 page={page}
@@ -84,11 +82,21 @@ const PaginationSelector = ({
 
     return (
         <Inline align="center">
-            <Button type="icon" disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
+            <Button
+                aria-label="Previous page"
+                type="icon"
+                disabled={page <= 1}
+                onClick={() => onPageChange(page - 1)}
+            >
                 <ChevronLeft />
             </Button>
             {PageButtons}
-            <Button type="icon" disabled={page >= numPages} onClick={() => onPageChange(page + 1)}>
+            <Button
+                aria-label="Next page"
+                type="icon"
+                disabled={page >= numPages}
+                onClick={() => onPageChange(page + 1)}
+            >
                 <ChevronRight />
             </Button>
         </Inline>
