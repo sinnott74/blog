@@ -36,17 +36,15 @@ export const Button: FC<ButtonProps> = ({
             const x = e.clientX - left,
                 y = e.clientY - top;
             setOrigin({ x, y });
-            setAnimate(false);
+            setAnimate(true);
             onClick && onClick();
         },
         [onClick],
     );
 
-    useEffect(() => {
-        if (origin !== kInitialOrigin) {
-            setAnimate(true);
-        }
-    }, [origin]);
+    const onRippleAnimationEnd = () => {
+        setAnimate(false);
+    };
 
     return (
         <ButtonBase
@@ -61,7 +59,12 @@ export const Button: FC<ButtonProps> = ({
             onClick={handleClick}
         >
             {children}
-            {!disableRipple && <Ripple {...origin} animate={animate} />}
+            {!disableRipple && animate && (
+                <Ripple
+                    style={{ left: `${origin.x}px`, top: `${origin.y}px` }}
+                    onAnimationEnd={onRippleAnimationEnd}
+                />
+            )}
         </ButtonBase>
     );
 };

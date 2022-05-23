@@ -1,4 +1,4 @@
-import styled from "styled-components/macro";
+import { styled } from "@compiled/react";
 import { Text } from "../Typography/Typography";
 
 export const StyledButtonText = styled(Text)`

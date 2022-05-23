@@ -77,7 +77,7 @@ export const getResponsive = <P>(
  * Alignment
  ******************************/
 
-export type Align = "start" | "center";
+export type Align = "flex-start" | "center";
 export type RepsonsiveAlign = Responsive<Align>;
 
 export interface Alignable {
@@ -85,12 +85,12 @@ export interface Alignable {
 }
 
 const alignToFlexAlignLookup = {
-    start: "initial",
+    "flex-start": "initial",
     center: "center",
 } as const;
 
-export const getAlignment = (align: Align = "start") =>
-    alignToFlexAlignLookup[align] ?? alignToFlexAlignLookup.start;
+export const getAlignment = (align: Align = "flex-start") =>
+    alignToFlexAlignLookup[align] ?? alignToFlexAlignLookup["flex-start"];
 
 /******************************
  * Spacing

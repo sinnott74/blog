@@ -1,13 +1,13 @@
-export const defaultHeightToWidthRatio = 0.5;
+export const defaultWidthtoHeightRatio = 2;
 
 interface CalculateRatioInput {
-    heightToWidthRatio?: number;
+    widthToHeightRatio?: number;
     src?: string;
 }
-export const calculateRatio = ({ heightToWidthRatio, src }: CalculateRatioInput) => {
+export const calculateRatio = ({ widthToHeightRatio, src }: CalculateRatioInput) => {
     const ratio =
-        heightToWidthRatio ||
-        (src && src.split("#")[1] && parseInt(src.split("#")[1])) ||
-        defaultHeightToWidthRatio;
+        widthToHeightRatio ||
+        (src && src.split("#")[1] && parseFloat(src.split("#")[1])) ||
+        defaultWidthtoHeightRatio;
     return ratio;
 };

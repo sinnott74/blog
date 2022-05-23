@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import me from "../../images/me.jpg";
 import { Container, Header, Avatar, Body, Links, Footer, Version } from "./styled";
-import { version } from "../../../../package.json";
+// import { version } from "../../../../package.json";
 import { PersonalLinks } from "../PersonalLinks/PersonalLinks";
 import { Heading2, Heading4 } from "../Typography/styled";
 
@@ -18,7 +18,7 @@ export const SideNavPanel: FC<SideNavPanelProps> = ({}) => (
             <Links></Links>
             <Footer>
                 <PersonalLinks />
-                <Version>Version {version}</Version>
+                {/* <Version>Version {version}</Version> */}
             </Footer>
         </Body>
     </Container>

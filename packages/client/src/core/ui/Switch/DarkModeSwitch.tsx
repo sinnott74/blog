@@ -1,8 +1,8 @@
 import { Switch } from "./Switch";
 
 import React, { FC } from "react";
-import { WbSunny, Brightness_2 } from "../Icons";
-import styled from "styled-components";
+import { WbSunny, Brightness_2, SVGIcon } from "../Icons";
+import { styled } from "@compiled/react";
 import { useColorScheme } from "../../services/colorScheme";
 
 interface Props {
@@ -23,7 +23,7 @@ export const DarkModeSwitch: FC<Props> = ({ className }) => {
             className={className}
             checked={!isDarkMode}
             onToggle={toggleScheme}
-            CheckedIcon={YellowSun}
+            CheckedIcon={YellowSun as SVGIcon}
             UncheckedIcon={Brightness_2}
         />
     );

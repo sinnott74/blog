@@ -6,6 +6,6 @@ export const scrollTo = (el: HTMLElement | null) => {
     window.scrollTo(x, y);
 };
 
-export const useScrollTop = () => {
+export const scrollTop = () => {
     window.scrollTo(0, 0);
 };

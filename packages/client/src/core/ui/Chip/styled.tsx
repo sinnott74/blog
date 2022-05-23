@@ -1,4 +1,4 @@
-import styled from "styled-components/macro";
+import { styled } from "@compiled/react";
 import { Cancel } from "../Icons";
 import { Text } from "../Typography/Typography";
 import { token } from "virtual:theme";
@@ -9,10 +9,10 @@ export const Container = styled.button`
     border-radius: 1rem;
     padding: calc(${token("spacing")} / 2);
     outline-style: none;
-    &:hover {
+    :hover {
         background: ${token("color-background-subtleNeutral-hover")};
     }
-    &:active {
+    :active {
         background: ${token("color-background-subtleNeutral-pressed")};
     }
 `;

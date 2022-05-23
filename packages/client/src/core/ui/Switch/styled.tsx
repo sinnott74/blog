@@ -1,4 +1,4 @@
-import styled from "styled-components/macro";
+import { styled } from "@compiled/react";
 import { token } from "virtual:theme";
 
 export const Label = styled.label`
@@ -9,9 +9,7 @@ export const Label = styled.label`
 `;
 
 export const Input = styled.input`
-    opacity: 0;
-    width: 0;
-    height: 0;
+    visibility: hidden;
 `;
 
 export const Slider = styled.span`
@@ -26,27 +24,27 @@ export const Slider = styled.span`
     border-radius: 34px;
     padding: 5px;
 
-    &:hover {
+    :hover {
         background-color: ${token("color-background-subtleNeutral-hover")};
     }
 
-    ${Input}:focus + & {
+    input:focus + & {
         box-shadow: 0 0 1px ${token("color-background-subtleNeutral-pressed")};
     }
 
-    ${Input}:hover:focus + & {
+    input:hover:focus + & {
         box-shadow: 0 0 1px ${token("color-background-subtleNeutral-hover")};
     }
 
-    ${Input}:checked + & {
+    input:checked + & {
         background-color: ${token("color-background-subtleBrand-resting")};
     }
 
-    ${Input}:hover:checked + & {
+    input:hover:checked + & {
         background-color: ${token("color-background-subtleBrand-hover")};
     }
 
-    &::before {
+    :before {
         position: absolute;
         content: "";
         height: 26px;
@@ -58,19 +56,19 @@ export const Slider = styled.span`
         border-radius: 50%;
         opacity: 1;
     }
-    &:hover::before {
+    :hover:before {
         background-color: ${token("color-background-boldNeutral-hover")};
     }
-    ${Input}:checked + &::before {
+    input:checked + &:before {
         transform: translateX(26px);
         background-color: ${token("color-background-boldBrand-resting")};
     }
 
-    ${Input}:checked + &:hover::before {
+    input:checked + &:hover:before {
         background-color: ${token("color-background-boldBrand-hover")};
     }
 
-    ${Input}:checked + &:focus::before {
+    input:checked + &:focus:before {
         background-color: ${token("color-background-boldBrand-pressed")};
     }
 `;

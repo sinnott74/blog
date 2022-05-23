@@ -3,6 +3,4 @@ import { Card } from "../Layout";
 
 interface Props {}
 
-export const Quote: FC<Props> = (props) => (
-    <Card forwardedAs="blockquote" accent spacing="medium" background="lighter" {...props} />
-);
+export const Quote: FC<Props> = (props) => <Card accent spacing="medium" {...props} />;
