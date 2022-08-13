@@ -4,12 +4,12 @@ import { Card, Stack } from "../core/ui/Layout";
 import { Page } from "../core/ui/Page/Page";
 import { Heading1, SecondaryText } from "../core/ui/Typography/styled";
 import { ShareLinks } from "../core/ui/ShareLinks/ShareLinks";
-import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../Routes";
 import { withMdx } from "../core/services/mdx";
 import { Spinner } from "../core/ui/Spinner/Spinner";
 import { Tags } from "../blog/ui/Tags";
+import { Head } from "../core/ui/Head/Head";
 
 interface Props {
     Post: React.LazyExoticComponent<() => JSX.Element>;
@@ -24,10 +24,10 @@ export const BlogPost: FC<Props> = ({ Post, title, imageurl, author, tags = [], 
     const navigate = useNavigate();
     return (
         <Page title={title}>
-            <Helmet>
+            <Head>
                 <meta name="keywords" content={tags.join()} />
                 <meta name="author" content={author} />
-            </Helmet>
+            </Head>
             <Card
                 rounded
                 raised
