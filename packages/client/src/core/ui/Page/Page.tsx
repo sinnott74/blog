@@ -1,8 +1,7 @@
 import React, { useEffect, FC } from "react";
-import Helmet from "react-helmet";
 import { scrollTop } from "../../common/utils/scrollTo";
 import { Box } from "../Layout";
-import { Box as BoxX } from "virtual-box";
+import { Head } from "../Head/Head";
 
 export interface Props {
     title: string;
@@ -19,9 +18,9 @@ export const Page: FC<Props> = ({ title, children }) => {
             spacing={{ mobile: "xsmall", tablet: "medium", desktop: "medium", wide: "medium" }}
             spacingTop={{ mobile: "small", tablet: "medium", desktop: "medium", wide: "medium" }}
         >
-            <Helmet>
+            <Head>
                 <title>{`${title} | DanielSinnott.com`}</title>
-            </Helmet>
+            </Head>
             {children}
         </Box>
     );
